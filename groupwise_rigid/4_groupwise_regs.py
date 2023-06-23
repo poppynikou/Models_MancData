@@ -1,25 +1,27 @@
 import os
 import shutil 
-from Functions.Patient_Info_Functions import *
-from Functions.Groupwise_Rigid_Functions import * 
+from Patient_Info_Functions import *
+from Groupwise_Rigid_Functions import * 
 
-no_iterations = 5
-patients = np.arange(1,21)
+no_iterations = 2
+patients = [3]
+base_path = 'T:/Poppy/PatData'
 # first you need copy all the original CBCT images which you want to use
 # and put them into a folder 'affine_0' to start off with 
 
 for patient in patients:
 
-    CBCTs = get_dates(patient)
-    results_folder = 'D:/MODELSPACE_UCLH_HN/HN_'+str(patient)+'/CBCT_GROUPWISE'
+    CBCTs = get_time_points(base_path, patient)
+    print(CBCTs)
+    results_folder = base_path + '/HN_'+str(patient)+'/CBCT_GROUPWISE'
     initial_folder = results_folder + '/affine_0'
 
     # for each iteration in the number of itterations of the groupwise 
-    for iteration in np.arange(0,no_iterations+1):
+    for iteration in np.arange(0,no_iterations):
 
         original_imgs_path = results_folder + '/affine_' + str(iteration)
-        original_imgs = [original_imgs_path + '/' + file for file in os.listdir(original_imgs_path) if file.startswith("CBCT_")]
-        
+        original_imgs = natsorted([original_imgs_path + '/' + file for file in os.listdir(original_imgs_path) if file.startswith("CBCT_")])
+
         result_path = results_folder + '/affine_' + str(iteration+1)
         if not os.path.exists(result_path):
             os.mkdir(result_path)

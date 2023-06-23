@@ -1,0 +1,236 @@
+[T:/Poppy/niftireg_executables/reg_f3d.exe] 
+[T:/Poppy/niftireg_executables/reg_f3d.exe] Command line:
+[T:/Poppy/niftireg_executables/reg_f3d.exe]      T:/Poppy/niftireg_executables/reg_f3d.exe -ref T:/Poppy/PatData/MASKED_average_pCT.nii.gz -flo T:/Poppy/PatData/HN_3/pCT/UCLHAtlas_Alignment/AFFINE_pCT.nii.gz -cpp T:/Poppy/PatData/HN_3/pCT/UCLHAtlas_Alignment/cpp_grid.nii.gz -res T:/Poppy/PatData/HN_3/pCT/UCLHAtlas_Alignment/DEF_pCT.nii.gz -be 0 --lncc -5 -ln 5 -vel -omp 12 -le 0.1 -sx -5 -sy -5 -sz -5
+[T:/Poppy/niftireg_executables/reg_f3d.exe] 
+[T:/Poppy/niftireg_executables/reg_f3d.exe] OpenMP is used with 12 thread(s)
+[NiftyReg F3D2] ***********************************************************
+[NiftyReg F3D2] INPUT PARAMETERS
+[NiftyReg F3D2] ***********************************************************
+[NiftyReg F3D2] Reference image:
+[NiftyReg F3D2]         * name: T:/Poppy/PatData/MASKED_average_pCT.nii.gz
+[NiftyReg F3D2]         * image dimension: 512 x 512 x 162 x 1
+[NiftyReg F3D2]         * image spacing: 1.26953 x 1.26953 x 2.5 mm
+[NiftyReg F3D2]         * intensity threshold for timepoint 0/0: [-3.4e+38 3.4e+38]
+[NiftyReg F3D2]         * gaussian smoothing sigma: 0
+[NiftyReg F3D2] 
+[NiftyReg F3D2] Floating image:
+[NiftyReg F3D2]         * gaussian smoothing sigma: 0
+[NiftyReg F3D2]         * name: T:/Poppy/PatData/HN_3/pCT/UCLHAtlas_Alignment/AFFINE_pCT.nii.gz
+[NiftyReg F3D2]         * image dimension: 512 x 512 x 151 x 1
+[NiftyReg F3D2]         * image spacing: 1.31641 x 1.31641 x 3 mm
+[NiftyReg F3D2]         * intensity threshold for timepoint 0/0: [-3.4e+38 3.4e+38]
+[NiftyReg F3D2]         * gaussian smoothing sigma: 0
+[NiftyReg F3D2]
+[NiftyReg F3D2] Warped image padding value: nan
+[NiftyReg F3D2] 
+[NiftyReg F3D2] Level number: 5
+[NiftyReg F3D2]
+[NiftyReg F3D2] Maximum iteration number during the last level: 150
+[NiftyReg F3D2]
+[NiftyReg F3D2] Final spacing in mm: -5 -5 -5
+[NiftyReg F3D2]
+[NiftyReg F3D2] The LNCC is used as a similarity measure.
+[NiftyReg F3D2] Similarity measure term weight: 0.9
+[NiftyReg F3D2]
+[NiftyReg F3D2] Linear energy penalty term weight: 0.1
+[NiftyReg F3D2]
+[NiftyReg F3D2] ***********************************************************
+[NiftyReg F3D2] Current level: 1 / 5
+[NiftyReg F3D2] Maximum iteration number: 2400
+[NiftyReg F3D2] Current reference image
+[NiftyReg F3D2]         * image dimension: 32 x 32 x 41 x 1
+[NiftyReg F3D2]         * image spacing: 20.3125 x 20.3125 x 10 mm
+[NiftyReg F3D2] Current floating image
+[NiftyReg F3D2]         * image dimension: 32 x 32 x 38 x 1
+[NiftyReg F3D2]         * image spacing: 21.0626 x 21.0626 x 12 mm
+[NiftyReg F3D2] Current control point image
+[NiftyReg F3D2]         * image dimension: 10 x 10 x 6
+[NiftyReg F3D2]         * image spacing: 103.438 x 103.438 x 220 mm
+[NiftyReg F3D2] Current backward control point image
+[NiftyReg F3D2]         * image dimension: 10 x 10 x 6
+[NiftyReg F3D2]         * image spacing: 103.438 x 103.438 x 220 mm
+[NiftyReg F3D2] Initial objective function: 1.75755 = (wSIM)1.75755 - (wBE)0 - (wLE)1.06072e-17 - (wJAC)0 - (wLAN)0
+[NiftyReg F3D2] [9] Current objective function: 1.76363 = (wSIM)1.76363 - (wLE)4.14e-08 [+ 10.5313 mm]
+[NiftyReg F3D2] [18] Current objective function: 1.76745 = (wSIM)1.76745 - (wLE)9.92e-08 [+ 16.3235 mm]
+[NiftyReg WARNING] Changing from 6 to 7 squaring step (equivalent to scaling down by 128)
+[NiftyReg WARNING] Changing from 7 to 6 squaring step (equivalent to scaling down by 64)
+[NiftyReg F3D2] [27] Current objective function: 1.76816 = (wSIM)1.76816 - (wLE)1.62e-07 [+ 16.3235 mm]
+[NiftyReg WARNING] Changing from 6 to 7 squaring step (equivalent to scaling down by 128)
+[NiftyReg WARNING] Changing from 7 to 6 squaring step (equivalent to scaling down by 64)
+[NiftyReg F3D2] [36] Current objective function: 1.76961 = (wSIM)1.76961 - (wLE)2.38e-07 [+ 16.3235 mm]
+[NiftyReg WARNING] Changing from 6 to 7 squaring step (equivalent to scaling down by 128)
+[NiftyReg F3D2] [45] Current objective function: 1.77089 = (wSIM)1.77089 - (wLE)3.76e-07 [+ 16.3235 mm]
+[NiftyReg F3D2] [54] Current objective function: 1.77095 = (wSIM)1.77095 - (wLE)3.93e-07 [+ 1.02022 mm]
+[NiftyReg F3D2] [67] Current objective function: 1.77575 = (wSIM)1.77575 - (wLE)4.41e-07 [+ 10.6731 mm]
+[NiftyReg F3D2] [75] Current objective function: 1.77692 = (wSIM)1.77692 - (wLE)4.44e-07 [+ 5.33653 mm]
+[NiftyReg F3D2] [82] Current objective function: 1.77763 = (wSIM)1.77764 - (wLE)4.20e-07 [+ 5.33653 mm]
+[NiftyReg F3D2] [89] Current objective function: 1.77807 = (wSIM)1.77807 - (wLE)3.83e-07 [+ 5.33653 mm]
+[NiftyReg F3D2] [96] Current objective function: 1.7783 = (wSIM)1.7783 - (wLE)3.53e-07 [+ 5.33653 mm]
+[NiftyReg F3D2] [103] Current objective function: 1.77836 = (wSIM)1.77836 - (wLE)3.41e-07 [+ 5.33653 mm]
+[NiftyReg F3D2] [110] Current objective function: 1.7784 = (wSIM)1.7784 - (wLE)3.37e-07 [+ 5.33653 mm]
+[NiftyReg F3D2] [117] Current objective function: 1.77852 = (wSIM)1.77852 - (wLE)3.36e-07 [+ 5.33653 mm]
+[NiftyReg F3D2] [124] Current objective function: 1.77882 = (wSIM)1.77882 - (wLE)3.39e-07 [+ 5.33653 mm]
+[NiftyReg F3D2] [131] Current objective function: 1.77895 = (wSIM)1.77895 - (wLE)3.48e-07 [+ 2.66827 mm]
+[NiftyReg F3D2] [137] Current objective function: 1.77906 = (wSIM)1.77906 - (wLE)3.56e-07 [+ 2.66827 mm]
+[NiftyReg F3D2] [144] Current objective function: 1.77908 = (wSIM)1.77909 - (wLE)3.63e-07 [+ 3.40204 mm]
+[NiftyReg F3D2] [151] Current objective function: 1.77911 = (wSIM)1.77911 - (wLE)3.67e-07 [+ 3.40204 mm]
+[NiftyReg F3D2] [158] Current objective function: 1.77927 = (wSIM)1.77927 - (wLE)3.77e-07 [+ 3.40204 mm]
+[NiftyReg F3D2] [165] Current objective function: 1.77938 = (wSIM)1.77938 - (wLE)3.81e-07 [+ 1.70102 mm]
+[NiftyReg F3D2] [170] Current objective function: 1.77938 = (wSIM)1.77938 - (wLE)3.81e-07 [+ 0 mm]
+[NiftyReg F3D2] Current registration level done
+[NiftyReg F3D2] ***********************************************************
+[NiftyReg F3D2] Current level: 2 / 5
+[NiftyReg F3D2] Maximum iteration number: 1200
+[NiftyReg F3D2] Current reference image
+[NiftyReg F3D2]         * image dimension: 64 x 64 x 41 x 1
+[NiftyReg F3D2]         * image spacing: 10.1562 x 10.1562 x 10 mm
+[NiftyReg F3D2] Current floating image
+[NiftyReg F3D2]         * image dimension: 64 x 64 x 38 x 1
+[NiftyReg F3D2]         * image spacing: 10.5313 x 10.5313 x 12 mm
+[NiftyReg F3D2] Current control point image
+[NiftyReg F3D2]         * image dimension: 17 x 17 x 9
+[NiftyReg F3D2]         * image spacing: 51.7189 x 51.7189 x 110 mm
+[NiftyReg F3D2] Current backward control point image
+[NiftyReg F3D2]         * image dimension: 17 x 17 x 9
+[NiftyReg F3D2]         * image spacing: 51.7189 x 51.7189 x 110 mm
+[NiftyReg F3D2] Initial objective function: 1.76619 = (wSIM)1.76619 - (wBE)0 - (wLE)2.90339e-06 - (wJAC)0 - (wLAN)0
+[NiftyReg F3D2] [9] Current objective function: 1.76736 = (wSIM)1.76736 - (wLE)2.75e-06 [+ 6 mm]
+[NiftyReg F3D2] [18] Current objective function: 1.77049 = (wSIM)1.77049 - (wLE)2.75e-06 [+ 7.65 mm]
+[NiftyReg F3D2] [27] Current objective function: 1.77199 = (wSIM)1.77199 - (wLE)2.87e-06 [+ 7.65 mm]
+[NiftyReg F3D2] [36] Current objective function: 1.77238 = (wSIM)1.77238 - (wLE)2.98e-06 [+ 7.65 mm]
+[NiftyReg F3D2] [45] Current objective function: 1.7724 = (wSIM)1.7724 - (wLE)3.52e-06 [+ 7.65 mm]
+[NiftyReg F3D2] [54] Current objective function: 1.77287 = (wSIM)1.77288 - (wLE)3.78e-06 [+ 1.9125 mm]
+[NiftyReg F3D2] [63] Current objective function: 1.77474 = (wSIM)1.77474 - (wLE)3.67e-06 [+ 4.30552 mm]
+[NiftyReg F3D2] [71] Current objective function: 1.77534 = (wSIM)1.77534 - (wLE)3.53e-06 [+ 4.30552 mm]
+[NiftyReg F3D2] [80] Current objective function: 1.77558 = (wSIM)1.77558 - (wLE)3.41e-06 [+ 2.30076 mm]
+[NiftyReg F3D2] [88] Current objective function: 1.77574 = (wSIM)1.77574 - (wLE)3.35e-06 [+ 2.45894 mm]
+[NiftyReg F3D2] [95] Current objective function: 1.77576 = (wSIM)1.77577 - (wLE)3.34e-06 [+ 1.22947 mm]
+[NiftyReg F3D2] [102] Current objective function: 1.7758 = (wSIM)1.7758 - (wLE)3.33e-06 [+ 1.56757 mm]
+[NiftyReg F3D2] [109] Current objective function: 1.7758 = (wSIM)1.77581 - (wLE)3.33e-06 [+ 0.999328 mm]
+[NiftyReg F3D2] [117] Current objective function: 1.77582 = (wSIM)1.77583 - (wLE)3.34e-06 [+ 2.24974 mm]
+[NiftyReg F3D2] [124] Current objective function: 1.77583 = (wSIM)1.77583 - (wLE)3.35e-06 [+ 1.12487 mm]
+[NiftyReg F3D2] [131] Current objective function: 1.77588 = (wSIM)1.77588 - (wLE)3.36e-06 [+ 2.36222 mm]
+[NiftyReg F3D2] [138] Current objective function: 1.77589 = (wSIM)1.77589 - (wLE)3.36e-06 [+ 0.147639 mm]
+[NiftyReg F3D2] [140] Current objective function: 1.77589 = (wSIM)1.77589 - (wLE)3.36e-06 [+ 0 mm]
+[NiftyReg F3D2] Current registration level done
+[NiftyReg F3D2] ***********************************************************
+[NiftyReg F3D2] Current level: 3 / 5
+[NiftyReg F3D2] Maximum iteration number: 600
+[NiftyReg F3D2] Current reference image
+[NiftyReg F3D2]         * image dimension: 128 x 128 x 41 x 1
+[NiftyReg F3D2]         * image spacing: 5.07812 x 5.07812 x 10 mm
+[NiftyReg F3D2] Current floating image
+[NiftyReg F3D2]         * image dimension: 128 x 128 x 38 x 1
+[NiftyReg F3D2]         * image spacing: 5.26566 x 5.26566 x 12 mm
+[NiftyReg F3D2] Current control point image
+[NiftyReg F3D2]         * image dimension: 31 x 31 x 15
+[NiftyReg F3D2]         * image spacing: 25.8594 x 25.8594 x 55 mm
+[NiftyReg F3D2] Current backward control point image
+[NiftyReg F3D2]         * image dimension: 31 x 31 x 15
+[NiftyReg F3D2]         * image spacing: 25.8594 x 25.8594 x 55 mm
+[NiftyReg F3D2] Initial objective function: 1.72682 = (wSIM)1.72683 - (wBE)0 - (wLE)1.51178e-05 - (wJAC)0 - (wLAN)0
+[NiftyReg F3D2] [9] Current objective function: 1.73073 = (wSIM)1.73074 - (wLE)1.55e-05 [+ 12 mm]
+[NiftyReg F3D2] [18] Current objective function: 1.73317 = (wSIM)1.73319 - (wLE)1.67e-05 [+ 12 mm]
+[NiftyReg F3D2] [27] Current objective function: 1.73325 = (wSIM)1.73327 - (wLE)1.73e-05 [+ 3 mm]
+[NiftyReg F3D2] [35] Current objective function: 1.73918 = (wSIM)1.7392 - (wLE)1.71e-05 [+ 6.3 mm]
+[NiftyReg F3D2] [43] Current objective function: 1.73919 = (wSIM)1.73921 - (wLE)1.72e-05 [+ 0.787501 mm]
+[NiftyReg F3D2] [52] Current objective function: 1.7401 = (wSIM)1.74012 - (wLE)1.72e-05 [+ 2.02299 mm]
+[NiftyReg F3D2] [59] Current objective function: 1.7403 = (wSIM)1.74031 - (wLE)1.73e-05 [+ 1.0115 mm]
+[NiftyReg F3D2] [67] Current objective function: 1.74066 = (wSIM)1.74068 - (wLE)1.74e-05 [+ 2.73609 mm]
+[NiftyReg F3D2] [75] Current objective function: 1.741 = (wSIM)1.74102 - (wLE)1.77e-05 [+ 2.9242 mm]
+[NiftyReg F3D2] [82] Current objective function: 1.74159 = (wSIM)1.74161 - (wLE)1.80e-05 [+ 2.9242 mm]
+[NiftyReg F3D2] [90] Current objective function: 1.74193 = (wSIM)1.74194 - (wLE)1.84e-05 [+ 3.32628 mm]
+[NiftyReg F3D2] [97] Current objective function: 1.74205 = (wSIM)1.74206 - (wLE)1.87e-05 [+ 3.32628 mm]
+[NiftyReg F3D2] [104] Current objective function: 1.7428 = (wSIM)1.74282 - (wLE)1.93e-05 [+ 3.32628 mm]
+[NiftyReg F3D2] [113] Current objective function: 1.74389 = (wSIM)1.74391 - (wLE)2.08e-05 [+ 6.98519 mm]
+[NiftyReg F3D2] [123] Current objective function: 1.74444 = (wSIM)1.74446 - (wLE)2.11e-05 [+ 1.98641 mm]
+[NiftyReg F3D2] [136] Current objective function: 1.74567 = (wSIM)1.7457 - (wLE)2.42e-05 [+ 15.5463 mm]
+[NiftyReg F3D2] [145] Current objective function: 1.74585 = (wSIM)1.74588 - (wLE)2.41e-05 [+ 3 mm]
+[NiftyReg F3D2] [151] Current objective function: 1.74585 = (wSIM)1.74588 - (wLE)2.41e-05 [+ 0 mm]
+[NiftyReg F3D2] Current registration level done
+[NiftyReg F3D2] ***********************************************************
+[NiftyReg F3D2] Current level: 4 / 5
+[NiftyReg F3D2] Maximum iteration number: 300
+[NiftyReg F3D2] Current reference image
+[NiftyReg F3D2]         * image dimension: 256 x 256 x 81 x 1
+[NiftyReg F3D2]         * image spacing: 2.53906 x 2.53906 x 5 mm
+[NiftyReg F3D2] Current floating image
+[NiftyReg F3D2]         * image dimension: 256 x 256 x 76 x 1
+[NiftyReg F3D2]         * image spacing: 2.63283 x 2.63283 x 6 mm
+[NiftyReg F3D2] Current control point image
+[NiftyReg F3D2]         * image dimension: 59 x 59 x 27
+[NiftyReg F3D2]         * image spacing: 12.9297 x 12.9297 x 27.5 mm
+[NiftyReg F3D2] Current backward control point image
+[NiftyReg F3D2]         * image dimension: 59 x 59 x 27
+[NiftyReg F3D2]         * image spacing: 12.9297 x 12.9297 x 27.5 mm
+[NiftyReg F3D2] Initial objective function: 1.52575 = (wSIM)1.52584 - (wBE)0 - (wLE)9.1632e-05 - (wJAC)0 - (wLAN)0
+[NiftyReg F3D2] [10] Current objective function: 1.53943 = (wSIM)1.53953 - (wLE)9.74e-05 [+ 12 mm]
+[NiftyReg F3D2] [20] Current objective function: 1.54998 = (wSIM)1.55008 - (wLE)1.02e-04 [+ 12 mm]
+[NiftyReg F3D2] [30] Current objective function: 1.55711 = (wSIM)1.55722 - (wLE)1.10e-04 [+ 7.5 mm]
+[NiftyReg F3D2] [40] Current objective function: 1.56166 = (wSIM)1.56177 - (wLE)1.11e-04 [+ 6.75 mm]
+[NiftyReg F3D2] [49] Current objective function: 1.5641 = (wSIM)1.56421 - (wLE)1.12e-04 [+ 6 mm]
+[NiftyReg F3D2] [58] Current objective function: 1.56507 = (wSIM)1.56519 - (wLE)1.13e-04 [+ 6 mm]
+[NiftyReg F3D2] [68] Current objective function: 1.56806 = (wSIM)1.56817 - (wLE)1.16e-04 [+ 9.00001 mm]
+[NiftyReg F3D2] [79] Current objective function: 1.57029 = (wSIM)1.57041 - (wLE)1.22e-04 [+ 9.20626 mm]
+[NiftyReg F3D2] [88] Current objective function: 1.5715 = (wSIM)1.57162 - (wLE)1.25e-04 [+ 6 mm]
+[NiftyReg F3D2] [97] Current objective function: 1.57349 = (wSIM)1.57362 - (wLE)1.29e-04 [+ 6 mm]
+[NiftyReg WARNING] Changing from 7 to 8 squaring step (equivalent to scaling down by 256)
+[NiftyReg WARNING] Changing from 8 to 7 squaring step (equivalent to scaling down by 128)
+[NiftyReg F3D2] [106] Current objective function: 1.57413 = (wSIM)1.57427 - (wLE)1.35e-04 [+ 6 mm]
+[NiftyReg WARNING] Changing from 7 to 8 squaring step (equivalent to scaling down by 256)
+[NiftyReg F3D2] [115] Current objective function: 1.57585 = (wSIM)1.57599 - (wLE)1.36e-04 [+ 3 mm]
+[NiftyReg F3D2] [123] Current objective function: 1.57603 = (wSIM)1.57617 - (wLE)1.38e-04 [+ 3 mm]
+[NiftyReg F3D2] [131] Current objective function: 1.57672 = (wSIM)1.57686 - (wLE)1.39e-04 [+ 3 mm]
+[NiftyReg F3D2] [143] Current objective function: 1.57711 = (wSIM)1.57725 - (wLE)1.42e-04 [+ 4.93927 mm]
+[NiftyReg F3D2] [153] Current objective function: 1.57779 = (wSIM)1.57793 - (wLE)1.43e-04 [+ 2.55453 mm]
+[NiftyReg F3D2] [162] Current objective function: 1.57816 = (wSIM)1.5783 - (wLE)1.45e-04 [+ 3.25702 mm]
+[NiftyReg F3D2] [170] Current objective function: 1.57843 = (wSIM)1.57858 - (wLE)1.45e-04 [+ 3.25702 mm]
+[NiftyReg F3D2] [181] Current objective function: 1.57895 = (wSIM)1.5791 - (wLE)1.50e-04 [+ 6.96291 mm]
+[NiftyReg F3D2] [190] Current objective function: 1.57953 = (wSIM)1.57968 - (wLE)1.50e-04 [+ 3 mm]
+[NiftyReg F3D2] [199] Current objective function: 1.58004 = (wSIM)1.58019 - (wLE)1.52e-04 [+ 3.10313 mm]
+[NiftyReg F3D2] [207] Current objective function: 1.5803 = (wSIM)1.58046 - (wLE)1.54e-04 [+ 3.10313 mm]
+[NiftyReg F3D2] [215] Current objective function: 1.5805 = (wSIM)1.58066 - (wLE)1.56e-04 [+ 3.10313 mm]
+[NiftyReg F3D2] [223] Current objective function: 1.58081 = (wSIM)1.58097 - (wLE)1.57e-04 [+ 1.55156 mm]
+[NiftyReg F3D2] [236] Current objective function: 1.5812 = (wSIM)1.58136 - (wLE)1.62e-04 [+ 9.7848 mm]
+[NiftyReg F3D2] [245] Current objective function: 1.58136 = (wSIM)1.58152 - (wLE)1.63e-04 [+ 3 mm]
+[NiftyReg F3D2] [257] Current objective function: 1.58193 = (wSIM)1.5821 - (wLE)1.67e-04 [+ 7.2699 mm]
+[NiftyReg F3D2] [266] Current objective function: 1.58225 = (wSIM)1.58241 - (wLE)1.68e-04 [+ 6 mm]
+[NiftyReg F3D2] [275] Current objective function: 1.58225 = (wSIM)1.58242 - (wLE)1.69e-04 [+ 0.1875 mm]
+[NiftyReg F3D2] [284] Current objective function: 1.58239 = (wSIM)1.58256 - (wLE)1.69e-04 [+ 1.14471 mm]
+[NiftyReg F3D2] [292] Current objective function: 1.58244 = (wSIM)1.58261 - (wLE)1.70e-04 [+ 2.40388 mm]
+[NiftyReg F3D2] [300] Current objective function: 1.58263 = (wSIM)1.5828 - (wLE)1.71e-04 [+ 2.73442 mm]
+[NiftyReg WARNING] The current level reached the maximum number of iteration
+[NiftyReg F3D2] Current registration level done
+[NiftyReg F3D2] ***********************************************************
+[NiftyReg F3D2] Current level: 5 / 5
+[NiftyReg F3D2] Maximum iteration number: 150
+[NiftyReg F3D2] Current reference image
+[NiftyReg F3D2]         * image dimension: 512 x 512 x 162 x 1
+[NiftyReg F3D2]         * image spacing: 1.26953 x 1.26953 x 2.5 mm
+[NiftyReg F3D2] Current floating image
+[NiftyReg F3D2]         * image dimension: 512 x 512 x 151 x 1
+[NiftyReg F3D2]         * image spacing: 1.31641 x 1.31641 x 3 mm
+[NiftyReg F3D2] Current control point image
+[NiftyReg F3D2]         * image dimension: 115 x 115 x 51
+[NiftyReg F3D2]         * image spacing: 6.46486 x 6.46486 x 13.75 mm
+[NiftyReg F3D2] Current backward control point image
+[NiftyReg F3D2]         * image dimension: 115 x 115 x 51
+[NiftyReg F3D2]         * image spacing: 6.46486 x 6.46486 x 13.75 mm
+[NiftyReg F3D2] Initial objective function: 1.2518 = (wSIM)1.2524 - (wBE)0 - (wLE)0.00059628 - (wJAC)0 - (wLAN)0
+[NiftyReg F3D2] [12] Current objective function: 1.27047 = (wSIM)1.27108 - (wLE)6.17e-04 [+ 12 mm]
+[NiftyReg F3D2] [23] Current objective function: 1.28302 = (wSIM)1.28366 - (wLE)6.39e-04 [+ 9.00001 mm]
+[NiftyReg F3D2] [34] Current objective function: 1.29369 = (wSIM)1.29435 - (wLE)6.62e-04 [+ 6.09375 mm]
+[NiftyReg F3D2] [45] Current objective function: 1.30056 = (wSIM)1.30123 - (wLE)6.70e-04 [+ 6.04688 mm]
+[NiftyReg F3D2] [57] Current objective function: 1.30617 = (wSIM)1.30685 - (wLE)6.78e-04 [+ 6.85313 mm]
+[NiftyReg F3D2] [67] Current objective function: 1.31029 = (wSIM)1.31097 - (wLE)6.87e-04 [+ 6 mm]
+[NiftyReg F3D2] [77] Current objective function: 1.314 = (wSIM)1.3147 - (wLE)6.97e-04 [+ 6 mm]
+[NiftyReg F3D2] [88] Current objective function: 1.31687 = (wSIM)1.31758 - (wLE)7.05e-04 [+ 6.1875 mm]
+[NiftyReg F3D2] [99] Current objective function: 1.31941 = (wSIM)1.32013 - (wLE)7.16e-04 [+ 6.75 mm]
+[NiftyReg F3D2] [111] Current objective function: 1.32072 = (wSIM)1.32144 - (wLE)7.19e-04 [+ 7.60313 mm]
+[NiftyReg F3D2] [120] Current objective function: 1.32092 = (wSIM)1.32165 - (wLE)7.24e-04 [+ 1.5 mm]
+[NiftyReg F3D2] [129] Current objective function: 1.32225 = (wSIM)1.32297 - (wLE)7.24e-04 [+ 2.325 mm]
+[NiftyReg F3D2] [140] Current objective function: 1.32282 = (wSIM)1.32355 - (wLE)7.32e-04 [+ 7.69576 mm]
+[NiftyReg F3D2] [150] Current objective function: 1.32396 = (wSIM)1.3247 - (wLE)7.32e-04 [+ 4.5 mm]
+[NiftyReg WARNING] The current level reached the maximum number of iteration
+[NiftyReg F3D2] Current registration level done
+[NiftyReg F3D2] ***********************************************************

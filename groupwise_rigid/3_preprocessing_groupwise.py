@@ -12,22 +12,24 @@ import numpy as np
 import pandas as pd
 from shutil import copyfile
 import shutil 
-
-reg_transform = 'C:/Users/poppy/Documents/Nifty/niftyreg_install/bin/reg_transform.exe'
-
 import sys
+from Patient_Info_Functions import get_time_points
 
-from Functions.Patient_Info_Functions import get_pCT_date, get_dates
+reg_transform = 'T:/Poppy/niftireg_executables/reg_transform.exe'
+# path to niftireg
 
-patients = np.arange(1,21)
+# enter patient list 
+patients =  [3]#np.arange(3,10)
+base_path = 'T:/Poppy/PatData'
 
-cut_path = 'D:/MODELSPACE_UCLH_HN/Rigid_groupwise_preprocessing.xlsx'
-preprocessing_info = pd.read_excel(cut_path, header=0)
+cut_path = base_path + '/Rigid_groupwise_preprocessing.csv'
+preprocessing_info = pd.read_csv(cut_path, header=0)
 
 for patient in patients:
     print(patient)
 
-    original_Path = 'D:/MODELSPACE_UCLH_HN/HN_' + str(patient) + '/CBCT_GROUPWISE/'
+    # make paths 
+    original_Path = base_path + '/HN_' + str(patient) + '/CBCT_GROUPWISE/'
     if not os.path.exists(original_Path):
         os.mkdir(original_Path)
     preprocessing_path = original_Path + 'preprocessing/'
@@ -37,18 +39,19 @@ for patient in patients:
     if not os.path.exists(affine_folder):
         os.mkdir(affine_folder)
 
-    CBCTs = get_dates(patient)
+
+    CBCTs = get_time_points(base_path, patient)
+    
 
     for index, CBCT_date in enumerate(CBCTs):
 
-        print(CBCT_date)
-
-        source = 'D:/MODELSPACE_UCLH_HN/HN_'+str(patient)+'/CBCT_'+str(CBCT_date)+'/InitAligned_MASKED_CBCT_'+str(CBCT_date)+'.nii.gz'
+    
+        source = 'T:/Poppy/PatData/HN_'+str(patient) + '/CBCT_' + str(CBCT_date) +'/CBCT_' + str(CBCT_date) + '.nii.gz'
         destination = preprocessing_path  + 'CBCT_' + str(CBCT_date) + '.nii.gz'
         shutil.copy(source, destination)
         
         # access info from the excel sheet 
-        patient_info = preprocessing_info.loc[(preprocessing_info['PATIENT']==int(patient)) & (preprocessing_info['CBCT_INDEX']==(index+1))]
+        patient_info = preprocessing_info.loc[(preprocessing_info['PATIENT']==int(patient))]# & (preprocessing_info['CBCT_INDEX']==(index+1))]
         lower_slice_cut = patient_info['LOWER'].iloc[0]
         upper_slice_cut = patient_info['UPPER'].iloc[0]
 
@@ -62,7 +65,7 @@ for patient in patients:
 
         # creates the transformation matrix to use in updating the Sform 
         identity_matrix = np.identity(4)
-        identity_matrix[2][3] = -z_shift #[row][column]
+        identity_matrix[2][3] = z_shift #[row][column]
         #print(identity_matrix)
 
         # saves the transformation matrix to use later on with updating the Sform 
@@ -74,7 +77,7 @@ for patient in patients:
         CBCT_CROPPED_path = preprocessing_path  + 'cropped_CBCT_' + str(CBCT_date) + '.nii.gz'
 
         # crop the image 
-        CBCT_image = np.array(CBCT.dataobj)[:,:,lower_slice_cut:upper_slice_cut]
+        CBCT_image = np.array(CBCT.dataobj)[:,lower_slice_cut:upper_slice_cut,:]
 
         # save the cropped image 
         clipped_img = nib.Nifti1Image(CBCT_image, CBCT.affine, CBCT.header)
@@ -92,3 +95,4 @@ for patient in patients:
         source = updated_img
         destination = affine_folder + '/CBCT_' + str(CBCT_date) + '.nii.gz'
         shutil.copy(source, destination)
+

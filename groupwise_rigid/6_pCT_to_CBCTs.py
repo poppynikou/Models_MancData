@@ -3,35 +3,36 @@
 import pandas as pd
 import os
 import shutil 
-from Functions.Patient_Info_Functions import *
+from Patient_Info_Functions import *
 import numpy as np 
-reg_transform = 'C:/Users/poppy/Documents/Nifty/niftyreg_install/bin/reg_transform.exe'
-reg_aladin = 'C:/Users/poppy/Documents/Nifty/niftyreg_install/bin/reg_aladin.exe'
 
-patients = np.arange(1,21)
+reg_transform = 'T:/Poppy/niftireg_executables/reg_transform.exe'
+reg_aladin = 'T:/Poppy/niftireg_executables/reg_aladin.exe'
 
-cut_path = 'D:/MODELSPACE_UCLH_HN/Rigid_pCT_preprocessing.xlsx'
-preprocessing_info = pd.read_excel(cut_path, header=0)
+patients = [3]
+base_path = 'T:/Poppy/PatData/'
+cut_path = 'T:/Poppy/PatData/Rigid_pCT_preprocessing.csv'
+preprocessing_info = pd.read_csv(cut_path, header=0)
 
 for patient in patients:
 
-    CT_date = get_pCT_date(patient)
-    CBCTs_dates = get_dates(patient)
+    CBCTs_dates = get_time_points(base_path, patient)
 
-    results_path = 'D:/MODELSPACE_UCLH_HN/HN_'+str(patient)+'/CBCT_pCT/'
+    results_path = base_path + '/HN_'+str(patient)+'/CBCT_pCT/'
     if not os.path.exists(results_path):
         os.mkdir(results_path)
-    pCT_results_path = 'D:/MODELSPACE_UCLH_HN/HN_'+str(patient)+'/CBCT_pCT/pCT/'
+    pCT_results_path = base_path + '/HN_'+str(patient)+'/CBCT_pCT/pCT/'
     if not os.path.exists(pCT_results_path):
         os.mkdir(pCT_results_path)
-    CBCT_results_path = 'D:/MODELSPACE_UCLH_HN/HN_'+str(patient)+'/CBCT_pCT/CBCT/'
+    CBCT_results_path = base_path + '/HN_'+str(patient)+'/CBCT_pCT/CBCT/'
     if not os.path.exists(CBCT_results_path):
         os.mkdir(CBCT_results_path)
 
-    CT_path = 'D:/MODELSPACE_UCLH_HN/HN_'+str(patient)+'/CT_' + str(CT_date) + '/MASKED_CT_' + str(CT_date) + '.nii.gz'
+    CT_path = base_path + '/HN_'+str(patient)+'/pCT/MASKED_rescaled_pCT.nii.gz'
 
     # access info from the excel sheet 
     patient_info = preprocessing_info.loc[preprocessing_info['PATIENT']==int(patient)]
+
     lower_slice_cut = patient_info['LOWER'].iloc[0]
     upper_slice_cut = patient_info['UPPER'].iloc[0]
 
@@ -42,7 +43,7 @@ for patient in patients:
 
     # creates the transformation matrix to use in updating the Sform 
     identity_matrix = np.identity(4)
-    identity_matrix[2][3] = -z_shift #[row][column]
+    identity_matrix[2][3] = z_shift #[row][column]
     #print(identity_matrix)
 
     # saves the transformation matrix to use later on with updating the Sform 
@@ -71,7 +72,7 @@ for patient in patients:
 
     # rigidly align the cropped pCT to the first cropped CBCT in the series
     ref_img = pCT_results_path  + 'cropped_Sformupdated_CT.nii.gz'
-    float_img = 'D:/MODELSPACE_UCLH_HN/HN_'+str(patient)+'/CBCT_GROUPWISE/affine_6/CBCT_' + str(CBCTs_dates[0]) + '.nii.gz'
+    float_img = base_path + '/HN_'+str(patient)+'/CBCT_GROUPWISE/affine_2/CBCT_' + str(CBCTs_dates[0]) + '.nii.gz'
     transformation = pCT_results_path + 'affine.txt'
     resampled_img = pCT_results_path + 'CBCT_' + str(CBCTs_dates[0]) + '.nii.gz'
     # rigid alignment of the cropped pCT to the first CBCT in the series
@@ -80,11 +81,10 @@ for patient in patients:
 
     os.remove(resampled_img)
 
-
     # update each CBCT with the affine to align to the pCT
     for CBCT in CBCTs_dates:
 
-        CBCT_to_update = 'D:/MODELSPACE_UCLH_HN/HN_'+str(patient)+'/CBCT_GROUPWISE/postprocessing/CBCT_' + str(CBCT) + '.nii.gz'
+        CBCT_to_update = base_path + '/HN_'+str(patient)+'/CBCT_GROUPWISE/postprocessing/CBCT_' + str(CBCT) + '.nii.gz'
         affine = pCT_results_path + 'affine.txt'
         updated_img = CBCT_results_path + '/CBCT_'+ str(CBCT) + '.nii.gz'
 

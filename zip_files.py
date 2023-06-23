@@ -12,17 +12,18 @@ def get_nifti_obj(path):
     return nifti_img, nifti_header, nifti_affine
 
 #\ the path which we want to search 
-root = 'T:/Poppy/PatDat/'
+root = 'T:/Poppy/PatData/'
 
 # find all files within a directory which are nifti files
 for path, subdirs, files in os.walk(root):
     
     for name in files:
 
-        file_path = os.path.join(path, name))
-
+        file_path = os.path.join(path, name)
+      
         if name[-4:] == '.nii':
-            
+
+           
             # read in nifti data
             nifti_img, nifti_header, nifti_affine = get_nifti_obj(file_path)
 
@@ -34,5 +35,5 @@ for path, subdirs, files in os.walk(root):
             nib.save(NewNiftiObj, zipped_path)
 
             # remove old .nii obj 
-            os.remove(path)
+            os.remove(file_path)
 
