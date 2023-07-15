@@ -22,6 +22,8 @@ file = open(flip_record, 'a')
 file.write('Patient No_Left_CTV_Voxels No_Right_CTV_Voxels Difference Flip \n')
 
 for patient in patients: 
+    
+    #print(patient)
 
     base_patient_path = base_path + 'HN_' + str(patient) 
     path_to_CT = base_patient_path + '/pCT/pCT.nii.gz'
@@ -72,7 +74,7 @@ for patient in patients:
             for img in imgs:
 
                 img_path = base_patient_path + '/' + folder + '/' + img
-
+                #print(img_path)
                 # flips imgs and binary objects 
                 img_obj, affine, header = get_metadata(img_path)
                 
