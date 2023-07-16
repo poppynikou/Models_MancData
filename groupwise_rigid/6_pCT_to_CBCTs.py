@@ -10,8 +10,8 @@ reg_transform = 'T:/Poppy/niftireg_executables/reg_transform.exe'
 reg_aladin = 'T:/Poppy/niftireg_executables/reg_aladin.exe'
 
 patients = np.arange(0,10)
-base_path = 'T:/Poppy/PatData/'
-cut_path = 'T:/Poppy/PatData/Rigid_pCT_preprocessing.csv'
+base_path = 'T:/Poppy/PatData/test/'
+cut_path = 'T:/Poppy/PatData/test/Rigid_pCT_preprocessing.csv'
 preprocessing_info = pd.read_csv(cut_path, header=0)
 
 for patient in patients:
@@ -28,7 +28,7 @@ for patient in patients:
     if not os.path.exists(CBCT_results_path):
         os.mkdir(CBCT_results_path)
 
-    CT_path = base_path + '/HN_'+str(patient)+'/pCT/MASKED_rescaled_pCT.nii.gz'
+    CT_path = base_path + '/HN_'+str(patient)+'/pCT/rescaled_MASKED_pCT.nii.gz'
 
     # access info from the excel sheet 
     patient_info = preprocessing_info.loc[preprocessing_info['PATIENT']==int(patient)]
@@ -81,10 +81,13 @@ for patient in patients:
 
     os.remove(resampled_img)
 
+    postprocessing_path =  base_path + '/HN_'+str(patient)+'/CBCT_GROUPWISE/postprocessing/'
+        
     # update each CBCT with the affine to align to the pCT
     for CBCT in CBCTs_dates:
+        
 
-        CBCT_to_update = base_path + '/HN_'+str(patient)+'/CBCT_GROUPWISE/postprocessing/CBCT_' + str(CBCT) + '.nii.gz'
+        CBCT_to_update = postprocessing_path + 'CBCT_' + str(CBCT) + '.nii.gz'
         affine = pCT_results_path + 'affine.txt'
         updated_img = CBCT_results_path + '/CBCT_'+ str(CBCT) + '.nii.gz'
 

@@ -5,7 +5,7 @@ from Groupwise_Rigid_Functions import *
 
 no_iterations = 2
 patients = np.arange(0,10)
-base_path = 'T:/Poppy/PatData'
+base_path = 'T:/Poppy/PatData/test/'
 # first you need copy all the original CBCT images which you want to use
 # and put them into a folder 'affine_0' to start off with 
 

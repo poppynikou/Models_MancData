@@ -20,7 +20,7 @@ reg_transform = 'T:/Poppy/niftireg_executables/reg_transform.exe'
 
 # enter patient list 
 patients =  np.arange(0,10)
-base_path = 'T:/Poppy/PatData'
+base_path = 'T:/Poppy/PatData/test/'
 
 cut_path = base_path + '/Rigid_groupwise_preprocessing.csv'
 preprocessing_info = pd.read_csv(cut_path, header=0)
@@ -46,7 +46,7 @@ for patient in patients:
     for index, CBCT_date in enumerate(CBCTs):
 
     
-        source = 'T:/Poppy/PatData/HN_'+str(patient) + '/CBCT_' + str(CBCT_date) +'/CBCT_' + str(CBCT_date) + '.nii.gz'
+        source = 'T:/Poppy/PatData/test/HN_'+str(patient) + '/CBCT_' + str(CBCT_date) +'/CBCT_' + str(CBCT_date) + '.nii.gz'
         destination = preprocessing_path  + 'CBCT_' + str(CBCT_date) + '.nii.gz'
         shutil.copy(source, destination)
         

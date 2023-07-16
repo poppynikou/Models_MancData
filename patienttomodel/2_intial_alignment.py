@@ -15,7 +15,7 @@ for patient in patients:
         os.mkdir(patienttomodel_path)
 
     ref_img = hn_atlas_path
-    float_img = base_path + '/HN_' + str(patient) + '/pCT/pCT.nii.gz'
+    float_img = base_path + '/HN_' + str(patient) + '/pCT/rescaled_MASKED_pCT.nii.gz'
     affine = patienttomodel_path + 'InitAlignment_affine.txt'
     resampled_img = patienttomodel_path + 'resampled_InitAlignment_pCT.nii.gz'
     command = reg_aladin + ' -ref ' + ref_img + ' -flo ' + float_img + ' -aff ' + affine + ' -res ' + resampled_img + ' -rigOnly -omp 12'

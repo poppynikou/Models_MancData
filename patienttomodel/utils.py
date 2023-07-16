@@ -59,7 +59,7 @@ def create_mask(couch_path, body_path, mask_path):
 
 
 def mask_img(img_path, y_slice, masked_img_path, masking_value = np.NaN):
-
+    
     '''
     :param img_path: string. path to the image you want to mask
     :param mask_path: string. path to binary/boolean image of the mask. 1s in region you want to mask. 
@@ -125,3 +125,19 @@ def crop_shift_CT(CT_path, Sform_matrix_path, CT_CROPPED_path, updated_img_path,
     # update the Sform of the cropped image 
     command = reg_transform + ' -ref ' + img_to_be_updated + ' -updSform ' + img_to_be_updated + ' ' + affine + ' ' + updated_img_path
     os.system(command)
+
+
+def rescale_CT(input_CT, output_CT):
+    
+    '''
+    scaled the HU by -1024 in the manchester data 
+    '''
+    CT_Img, CT_Affine, CT_Header = get_image_objects(input_CT)
+    CT_Img = np.array(CT_Img)
+    CT_Img_copy = CT_Img.copy()
+    
+    CT_Img_copy = CT_Img_copy -1024
+    
+    NewNiftiObj = nib.Nifti1Image(CT_Img_copy, CT_Affine, CT_Header)
+    nib.save(NewNiftiObj, output_CT)
+    
