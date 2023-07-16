@@ -1,7 +1,6 @@
 import numpy as np 
 import os 
 
-
 reg_aladin = 'T:/Poppy/niftireg_executables/reg_aladin.exe'
 reg_transform = 'T:/Poppy/niftireg_executables/reg_transform.exe'
 base_path = 'T:/Poppy/PatData/test/'
@@ -22,9 +21,3 @@ for patient in patients:
     os.system(command)
 
     os.remove(resampled_img)
-
-    img_to_be_updated = base_path + '/HN_' + str(patient) + '/pCT/pCT.nii.gz'
-    updated_img = patienttomodel_path + 'InitAlignment_pCT.nii.gz'
-    # update the Sform of the cropped image 
-    command = reg_transform + ' -ref ' + img_to_be_updated + ' -updSform ' + img_to_be_updated + ' ' + affine + ' ' + updated_img
-    os.system(command)

@@ -58,7 +58,7 @@ def create_mask(couch_path, body_path, mask_path):
     nib.save(NewniftiObj, mask_path)
 
 
-def mask_img(img_path, y_slice, masked_img_path, masking_value = np.NaN):
+def mask_img(img_path, y_slices, x_slices, z_cut, masked_img_path, masking_value = np.NaN):
     
     '''
     :param img_path: string. path to the image you want to mask
@@ -71,10 +71,15 @@ def mask_img(img_path, y_slice, masked_img_path, masking_value = np.NaN):
     CT_Img, CT_Affine, CT_Header = get_image_objects(img_path)
     CT_Img_copy = CT_Img.copy()
     CT_Img_copy = np.array(CT_Img_copy, dtype = np.float32)
-    (_,y,_) = np.shape(CT_Img_copy)
-    del _
+    (x,y,z) = np.shape(CT_Img_copy)
+  
 
-    CT_Img_copy[:,y_slice:y,:] = masking_value
+    CT_Img_copy[:,y_slices[0]:y,:] = masking_value
+    CT_Img_copy[:,0:y_slices[1],:] = masking_value
+    CT_Img_copy[x_slices[0]:x,:,:] = masking_value
+    CT_Img_copy[0:x_slices[1],:,:] = masking_value
+    CT_Img_copy[:,:,z_cut:z] = masking_value
+    
 
     newNiftiObj = nib.Nifti1Image(CT_Img_copy, CT_Affine, CT_Header)
     nib.save(newNiftiObj, masked_img_path)
@@ -140,4 +145,5 @@ def rescale_CT(input_CT, output_CT):
     
     NewNiftiObj = nib.Nifti1Image(CT_Img_copy, CT_Affine, CT_Header)
     nib.save(NewNiftiObj, output_CT)
+    
     
