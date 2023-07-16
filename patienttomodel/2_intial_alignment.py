@@ -21,3 +21,12 @@ for patient in patients:
     os.system(command)
 
     os.remove(resampled_img)
+    
+    # update CT with the initial alignment 
+    img_to_be_updated = base_path + '/HN_' + str(patient) + '/pCT/rescaled_MASKED_pCT.nii.gz'
+    affine = patienttomodel_path + 'InitAlignment_affine.txt'
+    updated_img_path = patienttomodel_path + 'InitAlignment_MASKED_rescaled_pCT.nii.gz'
+    # update the Sform of the cropped image 
+    command = reg_transform + ' -ref ' + img_to_be_updated + ' -updSform ' + img_to_be_updated + ' ' + affine + ' ' + updated_img_path
+    os.system(command)
+    

@@ -21,7 +21,7 @@ for patient in patients:
     z_cut = preprocessing_info.loc[(preprocessing_info['PATIENT']==int(patient))]['z_cut'].iloc[0]
     
     atlas_masked_path = base_path + '/HN_' + str(patient) + '/pCT/rescaled_MASKED_pCT.nii.gz'
-    masked_img_path = base_path + '/HN_' + str(patient) + '/pCT/rescaled_bedMASKED_pCT.nii.gz'
+    masked_img_path = base_path + '/HN_' + str(patient) + '/pCT/modelspace_rescaled_bedMASKED_pCT.nii.gz'
     rescaled_img_path = base_path + '/HN_' + str(patient) + '/pCT/rescaled_pCT.nii.gz'
     
     rescale_CT(CT_img_path, rescaled_img_path)
