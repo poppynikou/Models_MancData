@@ -58,7 +58,7 @@ def create_mask(couch_path, body_path, mask_path):
     nib.save(NewniftiObj, mask_path)
 
 
-def mask_img(img_path, y_slices, x_slices, z_cut, masked_img_path, masking_value = np.NaN):
+def mask_img(img_path, y_slices, x_slices, z_cut, masked_img_path, atlas_masked_path, masking_value = np.NaN):
     
     '''
     :param img_path: string. path to the image you want to mask
@@ -76,13 +76,17 @@ def mask_img(img_path, y_slices, x_slices, z_cut, masked_img_path, masking_value
 
     CT_Img_copy[:,y_slices[0]:y,:] = masking_value
     CT_Img_copy[:,0:y_slices[1],:] = masking_value
-    CT_Img_copy[x_slices[0]:x,:,:] = masking_value
-    CT_Img_copy[0:x_slices[1],:,:] = masking_value
-    CT_Img_copy[:,:,z_cut:z] = masking_value
     
 
     newNiftiObj = nib.Nifti1Image(CT_Img_copy, CT_Affine, CT_Header)
     nib.save(newNiftiObj, masked_img_path)
+    
+    
+    CT_Img_copy[x_slices[0]:x,:,:] = masking_value
+    CT_Img_copy[0:x_slices[1],:,:] = masking_value
+    CT_Img_copy[:,:,z_cut:z] = masking_value
+    newNiftiObj = nib.Nifti1Image(CT_Img_copy, CT_Affine, CT_Header)
+    nib.save(newNiftiObj, atlas_masked_path)
 
 
 def get_image_objects(Img_path):
@@ -146,4 +150,25 @@ def rescale_CT(input_CT, output_CT):
     NewNiftiObj = nib.Nifti1Image(CT_Img_copy, CT_Affine, CT_Header)
     nib.save(NewNiftiObj, output_CT)
     
+
+# check this works 
+def get_time_points(base_path, patient_no):
+    '''
+    This function assumes that each image is stored in the folder w/ naming convention:
+    CBCT_no - for CBCT images
+    This function only lists the relative time points of the CBCT images.
+    returns: no
     
+    '''
+    CBCT_dates = []
+    # function to find folder names of the CBCTs in the patient directory
+    directory = base_path + '/HN_' + str(patient_no) + '/'
+    dates = os.listdir(directory)
+    for date in dates:
+        if date[0:4] == 'CBCT':
+            if len(date) == 7:
+                CBCT_dates.append(date[-2:])
+            elif len(date) ==6:
+                CBCT_dates.append(date[-1])
+    CBCT_dates = np.sort(np.array(CBCT_dates, dtype = int))
+    return CBCT_dates

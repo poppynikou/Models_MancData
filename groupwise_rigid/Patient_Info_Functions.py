@@ -3,19 +3,13 @@ import numpy as np
 import os 
 from datetime import datetime, date
 
-
-
-
 # check this works 
 def get_time_points(base_path, patient_no):
     '''
     This function assumes that each image is stored in the folder w/ naming convention:
-
-    CBCT_yyyymmdd - for CBCT images
-    CT_yyyymmdd - for CT images 
-
-    This function only lists the dates of the CBCT images.
-    returns: yyyymmdd
+    CBCT_no - for CBCT images
+    This function only lists the relative time points of the CBCT images.
+    returns: no
     
     '''
     CBCT_dates = []
@@ -48,11 +42,11 @@ def get_metadata(cpp_directory):
     return cpp_affine, cpp_header
 
 
-def get_total_CBCT_numbers(patient_list):
+def get_total_CBCT_numbers(base_path, patient_list):
 
     no_CBCTs = 0
     for patient in patient_list:
-        no_CBCTs = no_CBCTs + len(get_dates(patient))
+        no_CBCTs = no_CBCTs + len(get_time_points(base_path, patient))
 
     return no_CBCTs
 
