@@ -136,7 +136,7 @@ def crop_shift_CT(CT_path, Sform_matrix_path, CT_CROPPED_path, updated_img_path,
     os.system(command)
 
 
-def rescale_CT(input_CT, output_CT):
+def rescale_CT_and_clip(input_CT, output_CT):
     
     '''
     scaled the HU by -1024 in the manchester data 
@@ -146,6 +146,7 @@ def rescale_CT(input_CT, output_CT):
     CT_Img_copy = CT_Img.copy()
     
     CT_Img_copy = CT_Img_copy -1024
+    CT_Img_copy[CT_Img_copy >1500] = 1500
     
     NewNiftiObj = nib.Nifti1Image(CT_Img_copy, CT_Affine, CT_Header)
     nib.save(NewNiftiObj, output_CT)
@@ -172,3 +173,33 @@ def get_time_points(base_path, patient_no):
                 CBCT_dates.append(date[-1])
     CBCT_dates = np.sort(np.array(CBCT_dates, dtype = int))
     return CBCT_dates
+
+def resample_CT(ref_img, float_img, transformation, resampled_img, padding_value):
+    
+    reg_resample = 'T:/Poppy/niftireg_executables/reg_resample.exe'
+    
+    command = reg_resample + ' -ref ' + ref_img + ' -flo ' + float_img + ' -trans ' + transformation + ' -res ' + resampled_img + ' -inter 3 -pad ' + str(padding_value) + ' -omp 12'
+    os.system(command)
+
+    
+def convert_to_float(img_path):
+    
+    img_obj, img_affine, img_header = get_image_objects(img_path)
+    
+    img_obj_copy = np.array(img_obj, dtype = np.float32)
+    
+    
+    niftiobject1 = nib.Nifti1Image(img_obj_copy, img_affine, img_header)
+    niftiobject1.set_data_dtype('float32')
+    nib.save(niftiobject1, img_path)
+    
+def convert_to_int(img_path):
+    
+    img_obj, img_affine, img_header = get_image_objects(img_path)
+    
+    img_obj_copy = np.array(img_obj, dtype = np.int32)
+    
+    
+    niftiobject1 = nib.Nifti1Image(img_obj_copy, img_affine, img_header)
+    niftiobject1.set_data_dtype('int32')
+    nib.save(niftiobject1, img_path)

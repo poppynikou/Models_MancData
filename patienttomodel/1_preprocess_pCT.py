@@ -11,7 +11,9 @@ preprocessing_info =  pd.read_csv(excel_sheet, header=0)
 
 for patient in patients:
 
+    print(patient)
     CT_img_path = base_path + '/HN_' + str(patient) + '/pCT/pCT.nii.gz'
+    
     y_slice_upper = preprocessing_info.loc[(preprocessing_info['PATIENT']==int(patient))]['y_slice_upper'].iloc[0]
     y_slice_lower = preprocessing_info.loc[(preprocessing_info['PATIENT']==int(patient))]['y_slice_lower'].iloc[0]
     y_slices = [y_slice_upper, y_slice_lower]
@@ -21,13 +23,15 @@ for patient in patients:
     z_cut = preprocessing_info.loc[(preprocessing_info['PATIENT']==int(patient))]['z_cut'].iloc[0]
     
     atlas_masked_path = base_path + '/HN_' + str(patient) + '/pCT/rescaled_MASKED_pCT.nii.gz'
-    masked_img_path = base_path + '/HN_' + str(patient) + '/pCT/modelspace_rescaled_bedMASKED_pCT.nii.gz'
+    masked_img_path = base_path + '/HN_' + str(patient) + '/pCT/rescaled_bedMASKED_pCT.nii.gz'
     rescaled_img_path = base_path + '/HN_' + str(patient) + '/pCT/rescaled_pCT.nii.gz'
     
-    rescale_CT(CT_img_path, rescaled_img_path)
+    
+    convert_to_float(CT_img_path)
+    # and clip 
+    rescale_CT_and_clip(CT_img_path, rescaled_img_path)
     # masks the image 
     mask_img(rescaled_img_path, y_slices, x_slices, z_cut, masked_img_path, atlas_masked_path, masking_value = np.NaN)
-    
 
 
 

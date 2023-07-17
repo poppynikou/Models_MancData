@@ -12,7 +12,7 @@ reg_aladin = 'T:/Poppy/niftireg_executables/reg_aladin.exe'
 reg_transform = 'T:/Poppy/niftireg_executables/reg_transform.exe'
 base_path = 'T:/Poppy/PatData/test/'
 
-patients = np.arange(0,10)
+patients = [0]#np.arange(0,10)
 
 for patient in patients:
 
@@ -26,7 +26,7 @@ for patient in patients:
     transformation = patienttomodel_path + '/atlas_rigid.txt'
     resampled_img1 = patienttomodel_path + '/resampled_pCT_atlas_rigid.nii.gz'
     command = reg_aladin + ' -ref ' + ref_img + ' -flo ' + float_img + ' -aff ' + transformation + ' -res ' + resampled_img1 + ' -rigOnly -omp 12' 
-    os.system(command)
+    #os.system(command)
 
     # delete resampled img, and update the Sform 
     os.remove(resampled_img1)
