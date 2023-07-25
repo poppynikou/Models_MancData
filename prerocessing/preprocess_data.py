@@ -3,6 +3,7 @@ from classes import *
 
 structures = []
 base_path = ''
+niftireg_path = ''
 
 # path to the file which contains all patient info
 patients_csv_path = 'T:/Poppy/Anonymisation_Key.csv'
@@ -13,11 +14,14 @@ flip_record.write('Patient No_Left_CTV_Voxels No_Right_CTV_Voxels Difference Fli
 
 # create instance of data class 
 Data = MancData(structures, base_path)
+Data.define_niftireg_path(niftireg_path)
 Data.read_anonymisation_key(patients_csv_path)
 
 patients = os.listdir(base_path)
 
 for patient in patients:
+
+    # check if the preprocessing for that patient has already been done
 
     PatientID = patient
     PatientObj = PatientData(PatientID)
@@ -44,22 +48,41 @@ for patient in patients:
 
 
     flip_img_Bool = ImgObj.flip_img_Bool(flip_record)
-    # find all files within a directory 
+
+    # preprocess the images 
     for path, subdirs, files in os.walk(patient_path):
         for name in files:
+
             file_path = os.path.join(path, name) 
 
             if flip_img_Bool:
                 ImgObj.flip_img(file_path)
+                ImgObj.rename_parotid(file_path, flip = True)
+            else:
+                ImgObj.rename_parotid(file_path, flip = False)
         
             if name[0:3] == 'pCT':
                 ImgObj.convert_to_float(file_path)
                 ImgObj.rescale_HU(file_path)
-                ImgObj.mask_CT(file_path)
+                ImgObj.clip_HU(file_path)
+                atlas_img_path = ''
+                masked_img_path = ''
+                ImgObj.mask_CT(file_path, atlas_img_path, masked_img_path)
+                cropped_img_path = ''
+                ImgObj.crop_Img(file_path, cropped_img_path, ImgType = 'CT')
 
             elif name[0:4] == 'CBCT':
                 ImgObj.convert_to_float(file_path)
-                ImgObj.mask_CBCT(file_path)
+                masked_img_path = '' 
+                ImgObj.mask_CBCT(file_path, masked_img_path)
+                cropped_img_path = ''
+                ImgObj.crop_Img(file_path, cropped_img_path, ImgType = 'CBCT')
+
+
+
+
+    
+
                 
 
 
