@@ -55,6 +55,7 @@ class PatientData(MancData):
         return self.CBCT_relative_timepoints
 
     def get_patient_folder(self):
+        self.patient_folder_path = str(self.base_path) + '/' + str(self.PatientNo) + '/'
         return self.patient_folder_path
 
     def refactor_pCT(self):
@@ -379,11 +380,12 @@ class GroupwiseRegs(MancData):
         MancData.__init__(self, structures, base_path, niftireg_path, '')
         return
         
-    def get_CBCT_relative_timepoints(self):
+    def get_CBCT_relative_timepoints(self, anonymisation_key_path):
 
-        # -------> check this [3:34] is correct <-------
-        self.CBCT_relative_timepoints = self.anonymisation_key.loc[self.anonymisation_key['Patient_ID'] == int(self.PatientNo[0:9])][3:34].item()
-
+        anonymisation_key = self.read_anonymisation_key(anonymisation_key_path)
+        CBCT_relative_timepoints = anonymisation_key.loc[anonymisation_key['No_Patient_ID'] == self.PatientNo].iloc[:,4:35].values.tolist()
+        self.CBCT_relative_timepoints = CBCT_relative_timepoints[0]
+        self.CBCT_relative_timepoints = [int(x) for x in self.CBCT_relative_timepoints if ~np.isnan(x)]
         return self.CBCT_relative_timepoints
 
     def refactor(self):
@@ -407,16 +409,14 @@ class GroupwiseRegs(MancData):
             os.mkdir(self.CBCT_pCT_path)
 
         for CBCT_timepoint in self.CBCT_relative_timepoints:
-            ## -------------> CHECK THIS <------------------
             # cropped imgs 
-            source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/cropped_' # ===== FILL THIS IN WITH THE CROPPED IMG 
+            source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/cropped_CBCT_' +str(CBCT_timepoint) + '.nii.gz'
             destination = self.results_folder + 'affine_0/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
             shutil.copy(source, destination)
 
         for CBCT_timepoint in self.CBCT_relative_timepoints:
-            ## -------------> CHECK THIS <------------------
             # full imgs 
-            source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/CBCT_' # ===== FILL THIS IN WITH THE CROPPED IMG 
+            source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/CBCT_' +str(CBCT_timepoint) + '.nii.gz'
             destination = self.postprocessing_path + '/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
             shutil.copy(source, destination)
     
@@ -461,7 +461,7 @@ class GroupwiseRegs(MancData):
         for CBCT_timepoint in self.CBCT_relative_timepoints:
             self.resampled_imgs.append(self.results_folder + '/affine_' + str(self.itteration +1) + '/CBCT_'+str(CBCT_timepoint)+'.nii.gz')
 
-    def __init__itteration(self, itteration):
+    def set__itteration(self, itteration):
 
         self.set_itteration(itteration)
         self.set_ref_img()
@@ -479,7 +479,7 @@ class GroupwiseRegs(MancData):
             affine_matrix = self.affine_matrixes[index]
             resampled_img = self.rigidReg_resampled_imgs[index]
 
-            rigidReg(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, rigOnly = True)
+            rigidReg(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
 
             os.remove(resampled_img)
 
@@ -531,7 +531,7 @@ class GroupwiseRegs(MancData):
 
             # imports the data 
             img_data, img_affine, img_header = self.get_img_objects(self.resampled_imgs[index])
-            del(_)
+          
 
             #store
             Nan_map[:,:,:,index] = img_data
@@ -562,7 +562,6 @@ class GroupwiseRegs(MancData):
 
     def rigidpCTReg(self):
 
-        # ---------------> check the cropped pCT path <---------------
         ref_img = self.results_folder = str(self.base_path) + '/' + str(self.PatientNo) + '/pCT/cropped_pCT.nii.gz'
         float_img = self.resampled_imgs[0]
         transformation = self.CBCT_pCT_path + '/affine.txt'
