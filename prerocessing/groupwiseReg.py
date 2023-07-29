@@ -15,7 +15,6 @@ for patient in patients:
 
         # if a certain path exists and is not empty 
         # check before you do it again 
-
         ImageObj = Image(patient, base_path, niftireg_path)
 
         GroupwiseReg = GroupwiseRegs(patient,no_itterations, base_path, niftireg_path)
@@ -35,18 +34,4 @@ for patient in patients:
         GroupwiseReg.UpdateGroupSform()
         GroupwiseReg.rigidpCTReg()
         GroupwiseReg.UpdateSform()
-
-
-
-
-
-
-
-
-
-
-
-            
-
-
 
