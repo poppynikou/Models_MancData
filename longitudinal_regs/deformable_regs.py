@@ -2,6 +2,8 @@ import os
 import numpy as np 
 from utils import *
 
+### CHECK THIS CODE ###
+
 patients = np.arange(1,8)
 reg_f3d = 'T:/Poppy/niftireg_executables/reg_f3d.exe'
 base_path = 'T:/Poppy/PatData/test/'
