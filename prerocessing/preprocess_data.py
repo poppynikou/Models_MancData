@@ -9,13 +9,17 @@ atlas_path = ''
 # path to the file which contains all patient info
 patients_csv_path = 'T:/Poppy/Anonymisation_Key.csv'
 
-patients = ['341831745', '398522277', '479586599', '855941986']
+
+patients = ['']
+
 
 flip_record = base_path + 'flip_record.txt'
 flip_record = open(flip_record, 'a')
 flip_record.write('Patient No_Left_CTV_Voxels No_Right_CTV_Voxels Difference Flip \n')
 
-masking_path = 'C:/Users/p62531jm/Documents/Poppy/prerocessing/meta_info.csv'
+
+=======
+masking_path = 'C:/Users/Poppy/Documents/Model_Development/prerocessing/meta_info.csv'
 
 for patient in patients:
 
