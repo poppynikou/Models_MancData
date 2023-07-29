@@ -1,5 +1,5 @@
 from classes import *
-from functions import * 
+from utils.functions import * 
 
 base_path = 'T:/Poppy/PatData/test2/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'

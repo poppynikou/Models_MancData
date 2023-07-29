@@ -1,5 +1,5 @@
 import os
-from classes import *
+from utils.classes import *
 
 
 base_path = 'T:/Poppy/PatData/batch2/'

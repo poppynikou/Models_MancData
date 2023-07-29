@@ -2,7 +2,7 @@ import numpy as np
 from classes import GroupwiseRegs, MancData, Image
 import os
 import pandas as pd
-from functions import * 
+from utils.functions import * 
 
 base_path = 'T:/Poppy/PatData/test2/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'
