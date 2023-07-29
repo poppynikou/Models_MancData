@@ -2,14 +2,14 @@ import os
 from classes import *
 
 structures = ['BRAINSTEM', 'BODY', 'CORD', 'CTVHIGH', 'CTVLOW', 'PAROTIDL', 'PAROTIDR']
-base_path = 'T:/Poppy/PatData/test2/'
+base_path = 'T:/Poppy/PatData/batch3/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'
 atlas_path = ''
 
 # path to the file which contains all patient info
 patients_csv_path = 'T:/Poppy/Anonymisation_Key.csv'
 
-patients = ['']
+patients = os.listdir(base_path)
 
 flip_record = base_path + 'flip_record.txt'
 flip_record = open(flip_record, 'a')

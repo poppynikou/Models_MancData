@@ -1,7 +1,4 @@
-name = 'BIN_PAROTIDL.nii.gz'
-new_name = name
+import os 
+base_path = 'T:/Poppy/PatData/batch3/'
 
-if name.__contains__('PAROTIDL'):
-    new_name= new_name.replace('PAROTIDL','LPAROTID')
-    
-    print(new_name)   
+patients = x in x for os.listdir(base_path) if x.__contains__
