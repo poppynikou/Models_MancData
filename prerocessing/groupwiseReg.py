@@ -8,7 +8,7 @@ structures = ['BRAINSTEM', 'BODY', 'CORD', 'CTVHIGH', 'CTVLOW', 'PAROTIDL', 'PAR
 base_path = 'T:/Poppy/PatData/test2/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'
 no_itterations = 2
-# path to the file which contains all patient info
+    # path to the file which contains all patient info
 patients_csv_path = 'T:/Poppy/Anonymisation_Key.csv'
 patients = ['HN_11']
 
