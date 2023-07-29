@@ -8,27 +8,24 @@ structures = ['BRAINSTEM', 'BODY', 'CORD', 'CTVHIGH', 'CTVLOW', 'PAROTIDL', 'PAR
 base_path = 'T:/Poppy/PatData/test2/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'
 no_itterations = 2
+# path to the file which contains all patient info
+patients_csv_path = 'T:/Poppy/Anonymisation_Key.csv'
+patients = ['HN_11']
 
-# create instance of manchester data class 
-Data = MancData(structures, base_path, niftireg_path)
-
-patients = os.listdir(base_path)
-
-for patient in patients:
-    if patient[0:3] == 'HN_':
+for patient in patients: 
 
         # if a certain path exists and is not empty 
         # check before you do it again 
 
-        ImageObj = Image(patient)
+        ImageObj = Image(patient, structures, base_path, niftireg_path)
 
-        GroupwiseReg = GroupwiseRegs(patient,no_itterations)
-        GroupwiseReg.get_CBCT_relative_timepoints()
+        GroupwiseReg = GroupwiseRegs(patient,no_itterations, structures, base_path, niftireg_path)
+        GroupwiseReg.get_CBCT_relative_timepoints(patients_csv_path)
         GroupwiseReg.refactor()
 
         for itteration in np.arange(0, no_itterations):
 
-            GroupwiseReg.__init__itteration(itteration)
+            GroupwiseReg.set__itteration(itteration)
             GroupwiseReg.rigidGroupReg()
             GroupwiseReg.avgAffine()
             GroupwiseReg.invAffine()

@@ -8,7 +8,7 @@ def UpdSform(reg_transform_path, img_to_be_updated_path, affine_matrix_path, upd
     os.system(command)
 
 
-def rigidReg(reg_aladin_path, ref_img, float_img, affine_matrix, resampled_img, RigOnly= True):
+def rigidReg(reg_aladin_path, ref_img, float_img, affine_matrix, resampled_img, RigOnly):
 
     basic_command = reg_aladin_path + ' -ref ' + ref_img + ' -flo ' + float_img + ' -aff ' + affine_matrix + ' -res ' + resampled_img + ' -omp 12 ' 
     if RigOnly:
