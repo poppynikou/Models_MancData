@@ -7,9 +7,8 @@ from functions import *
 
 class MancData():
     
-    def __init__(self, structures, base_path, niftireg_path, atlas_path):
+    def __init__(self, base_path, niftireg_path, atlas_path):
 
-        self.structures = structures
         self.base_path = base_path
         self.reg_transform = niftireg_path +'/reg_transform.exe'
         self.reg_average = niftireg_path +'/reg_average.exe'
@@ -36,9 +35,9 @@ class MancData():
 
 class PatientData(MancData):
 
-    def __init__(self, PatientID, structures, base_path, niftireg_path):
+    def __init__(self, PatientID, base_path, niftireg_path):
         self.PatientID = PatientID
-        MancData.__init__(self, structures, base_path, niftireg_path, '')
+        MancData.__init__(self, base_path, niftireg_path, '')
 
     def get_PatientNo(self, anonymisation_key_path):
         
@@ -116,10 +115,10 @@ class PatientData(MancData):
 
 class Image(MancData):
     
-    def __init__(self, PatientNo, structures, base_path, niftireg_path):
+    def __init__(self, PatientNo, base_path, niftireg_path):
 
         self.PatientNo = PatientNo
-        MancData.__init__(self, structures, base_path, niftireg_path, '')
+        MancData.__init__(self, base_path, niftireg_path, '')
         return
     
     def read_meta_info(self, csv_file):
@@ -254,7 +253,7 @@ class Image(MancData):
 
         img_data, img_affine, img_header = self.get_img_objects(img_path)
         img_data_copy = img_data.copy()
-        img_data_copy = img_data_copy+ 1024
+        img_data_copy = img_data_copy - 1024
 
         NewNiftiObj = nib.Nifti1Image(img_data_copy, img_affine, img_header)
        
@@ -356,7 +355,6 @@ class Image(MancData):
         z_slice_upper, z_slice_lower = self.return_cropping_info(ImgType=ImgType)
         affine_matrix_path = 'Sform_matrix_path.txt'
 
-        # -------> check that it is the lower slice  <-------
         self.calc_Sform_matrix(img_path, affine_matrix_path, z_slice_lower)
 
         img_data, img_affine, img_header = self.get_img_objects(img_path)
@@ -374,10 +372,10 @@ class Image(MancData):
 
 class GroupwiseRegs(MancData):
 
-    def __init__(self, PatientNo, no_itterations, structures, base_path, niftireg_path):
+    def __init__(self, PatientNo, no_itterations, base_path, niftireg_path):
         self.PatientNo = PatientNo 
         self.no_itterations = no_itterations 
-        MancData.__init__(self, structures, base_path, niftireg_path, '')
+        MancData.__init__(self, base_path, niftireg_path, '')
         return
         
     def get_CBCT_relative_timepoints(self, anonymisation_key_path):
@@ -555,7 +553,7 @@ class GroupwiseRegs(MancData):
             for itteration in np.arange(0, self.no_itterations):
                 
                 img = self.postprocessing_path + '/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
-                affine_matrix_path = self.results_folder + '/affine_' + str(itteration) + '/comp_affine_'+str(CBCT_timepoint)+'.txt'
+                affine_matrix_path = self.results_folder + '/affine_' + str(itteration+1) + '/comp_affine_'+str(CBCT_timepoint)+'.txt'
 
                 UpdSform(self.reg_transform, img, affine_matrix_path, img)
 
@@ -585,8 +583,8 @@ class GroupwiseRegs(MancData):
     
 class AtlasRegs(MancData):
 
-    def __init__(self, PatientNo, structures, base_path, niftireg_path, atlas_path):
-        MancData.__init__(self, structures, base_path, niftireg_path, atlas_path)
+    def __init__(self, PatientNo, base_path, niftireg_path, atlas_path):
+        MancData.__init__(self, base_path, niftireg_path, atlas_path)
         self.PatientNo = PatientNo
         self.PatientPath = self.base_path + '/' + str(self.PatientNo) +'/'
         self.PatientCTPath = self.PatientPath + 'pCT/'
