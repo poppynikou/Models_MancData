@@ -2,19 +2,18 @@ import os
 import numpy as np 
 from utils import *
 
-patients = np.arange(0,10)
+patients = np.arange(1,8)
 reg_f3d = 'T:/Poppy/niftireg_executables/reg_f3d.exe'
 base_path = 'T:/Poppy/PatData/test/'
 
 for patient in patients:
     
-    patient_path = base_path + '/HN_' + str(patient) + '/MODELSPACE_REGS/'
+    patient_path = base_path + '/UCLHMODELSPACE_REGS/HN_' + str(patient)
+    float_img = patient_path + '/pCT/MASKED_pCT.nii.gz'
     
     CBCT_dates = get_time_points(base_path, patient)
     
     for CBCT_date in CBCT_dates:
-        
-        float_img = patient_path + '/MASKED_pCT.nii.gz'
         
         CBCT_path = patient_path + '/CBCT_' + str(CBCT_date) + '/'
         ref_img = CBCT_path + 'MASKED_CBCT_' + str(CBCT_date) + '.nii.gz'

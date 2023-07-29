@@ -7,24 +7,23 @@ from functions import *
 
 class MancData():
     
-    def __init__(self, structures, base_path):
+    def __init__(self, structures, base_path, niftireg_path, atlas_path):
 
         self.structures = structures
         self.base_path = base_path
+        self.reg_transform = niftireg_path +'/reg_transform.exe'
+        self.reg_average = niftireg_path +'/reg_average.exe'
+        self.reg_aladin = niftireg_path +'/reg_aladin.exe'
+        self.reg_resample = niftireg_path +'/reg_resample.exe'
+        self.reg_f3d = niftireg_path +'/reg_f3d.exe'
+        self.atlas_path = atlas_path
         
 
     def read_anonymisation_key(self, anonymisation_key_path):
 
-        self.anonymisation_key = pd.read_csv(anonymisation_key_path, header = 0)
-        return self.anonymisation_key
+        anonymisation_key = pd.read_csv(anonymisation_key_path, header = 0)
+        return anonymisation_key
     
-    def set_niftireg_path(self, niftireg_path):
-
-        self.reg_transform = niftireg_path +'/reg_transform.exe'
-        self.reg_average = niftireg_path +'/reg_average.exe'
-        self.ref_aladin = niftireg_path +'/ref_aladin.exe'
-        self.reg_resample = niftireg_path +'/reg_resample.exe'
-        self.reg_f3d = niftireg_path +'/ref_f3d.exe'
 
     def get_img_objects(self, img_path):
     
@@ -34,21 +33,26 @@ class MancData():
         img_header = img_obj.header
 
         return img_data, img_affine, img_header
-    
-    def set_atlas_path(self):
-        # ---------> check this is in this location <----------
-        self.atlas_path = self.base_path + '/MASKED_average_pCT.nii.gz'
-
 
 class PatientData(MancData):
 
-    def __init__(self, PatientID):
+    def __init__(self, PatientID, structures, base_path, niftireg_path):
         self.PatientID = PatientID
+        MancData.__init__(self, structures, base_path, niftireg_path, '')
 
-    def get_PatientNo(self):
-
+    def get_PatientNo(self, anonymisation_key_path):
+        
+        self.anonymisation_key = self.read_anonymisation_key(anonymisation_key_path)
         self.PatientNo = self.anonymisation_key.loc[self.anonymisation_key['Patient_ID'] == int(self.PatientID[0:9])]['No_Patient_ID'].item()
         return self.PatientNo
+    
+    def get_CBCT_relative_timepoints(self):
+        
+
+        CBCT_relative_timepoints = self.anonymisation_key.loc[self.anonymisation_key['Patient_ID'] == int(self.PatientID[0:9])].iloc[:,4:35].values.tolist()
+        self.CBCT_relative_timepoints = CBCT_relative_timepoints[0]
+        self.CBCT_relative_timepoints = [int(x) for x in self.CBCT_relative_timepoints if ~np.isnan(x)]
+        return self.CBCT_relative_timepoints
 
     def get_patient_folder(self):
         return self.patient_folder_path
@@ -66,12 +70,14 @@ class PatientData(MancData):
             os.mkdir(self.pCT_folder_path)
 
         # move pCT file 
-        pCT_file = [file for file in os.listdir(self.patient_folder_path) if file[0:8] == 'pCT.nii']
+        pCT_file = [file for file in os.listdir(self.patient_folder_path) if file[0:8] == 'pCT.nii'][0]
         original_pCT_path = self.patient_folder_path + pCT_file
         pCT_path = str(self.pCT_folder_path)  + pCT_file
 
         if os.path.exists(original_pCT_path):
             shutil.move(original_pCT_path, pCT_path)
+            
+    
 
     def refactor_structures(self):
 
@@ -94,13 +100,13 @@ class PatientData(MancData):
         for index, CBCT in enumerate(CBCT_list):
 
             # creates new folder for the new CBCT
-            CBCT_folder = self.patient_folder_path + '/CBCT_' + str(self.CBCT_relative_timepoints[index])
+            CBCT_folder = self.patient_folder_path + '/CBCT_' + str(self.CBCT_relative_timepoints[index]) 
             if not os.path.exists(CBCT_folder):
                 os.mkdir(CBCT_folder)
 
             # move the CBCT file 
-            original_CBCT_path = self.patient_folder_path + '/' + str(CBCT)
-            CBCT_path = CBCT_folder + '/CBCT_' + str(self.CBCT_relative_timepoints[index])
+            original_CBCT_path = self.patient_folder_path + '/' + str(CBCT) 
+            CBCT_path = CBCT_folder + '/CBCT_' + str(self.CBCT_relative_timepoints[index]) + '.nii'
 
             if os.path.exists(original_CBCT_path):
                 shutil.move(original_CBCT_path, CBCT_path)
@@ -109,16 +115,16 @@ class PatientData(MancData):
 
 class Image(MancData):
     
-    def __init__(self, PatientNo):
+    def __init__(self, PatientNo, structures, base_path, niftireg_path):
 
         self.PatientNo = PatientNo
+        MancData.__init__(self, structures, base_path, niftireg_path, '')
         return
     
     def read_meta_info(self, csv_file):
 
         meta_info =  pd.read_csv(csv_file, header=0)
-
-        self.patient_masking_info = meta_info.loc[(meta_info['PatientNo']==int(self.PatientNo))]
+        self.patient_masking_info = meta_info.loc[(meta_info['PatientNo']==self.PatientNo)]
     
     
     def zip_nifti(self, img_path):
@@ -134,7 +140,7 @@ class Image(MancData):
         nib.save(NewNiftiObj, zipped_img_path)
 
         # remove old .nii obj 
-        os.remove(self.img_path)
+        os.remove(img_path)
 
     
     def flip_img_Bool(self, flip_record):
@@ -181,23 +187,40 @@ class Image(MancData):
             flip_record.write(str(self.PatientNo) + ' ' + str(CTV_left) + ' ' + str(CTV_right) + ' ' + str(Difference_in_Voxels) + ' False \n')
             return False
         
-    def rename_parotid(self, img_path, flip = False):
-        
-        if img_path.__contains__('PAROTIDL'):
-                source = img_path
-                destination = img_path.copy()
-                if flip:
-                    destination['PAROTIDL'] == 'RPAROTID'
-                else:
-                    destination['PAROTIDL'] == 'LPAROTID'
-                os.rename(source, destination)
-        elif img_path.__contains__('PAROTIDR'):
-            source = img_path
-            destination = img_path.copy()
+    def rename_parotid(self, name, flip = False):
+        new_name = name
+        file_path = self.base_path + '/' + self.PatientNo + '/pCT/'
+        if name.__contains__('PAROTIDL'):
             if flip:
-                destination['PAROTIDR'] == 'LPAROTID'
+                new_name=new_name.replace('PAROTIDL','RPAROTID')
             else:
-                destination['PAROTIDR'] == 'RPAROTID'
+                new_name=new_name.replace('PAROTIDL','LPAROTID')
+            source = file_path + name
+            destination = file_path + new_name
+            os.rename(source, destination)   
+        elif name.__contains__('PAROTIDR'):
+            if flip:
+                new_name=new_name.replace('PAROTIDR','LPAROTID')
+            else:
+                new_name=new_name.replace('PAROTIDR','RPAROTID')
+            source = file_path + name
+            destination = file_path + new_name
+            os.rename(source, destination)
+        elif name.__contains__('PAROTIDIPSI'):
+            if flip:
+                new_name=new_name.replace('PAROTIDIPSI','CONTRAPAROTID')
+            else:
+                new_name=new_name.replace('PAROTIDIPSI','IPSIPAROTID')
+            source = file_path + name
+            destination = file_path + new_name
+            os.rename(source, destination)
+        elif name.__contains__('PAROTIDCONTRA'):
+            if flip:
+                new_name=new_name.replace('PAROTIDCONTRA','IPSIPAROTID')
+            else:
+                new_name=new_name.replace('PAROTIDCONTRA','CONTRAPAROTID')
+            source = file_path + name
+            destination = file_path + new_name
             os.rename(source, destination)
     
     def flip_img(self, img_path, new_img_path = False):
@@ -256,18 +279,18 @@ class Image(MancData):
         
         y_slice_upper = self.patient_masking_info['CT_M_Y_+'].iloc[0]
         y_slice_lower = self.patient_masking_info['CT_M_Y_-'].iloc[0]
-        y_slices = [y_slice_upper, y_slice_lower]
+        y_slices = [int(y_slice_upper), int(y_slice_lower)]
         x_slice_upper = self.patient_masking_info['CT_M_X_+'].iloc[0]
         x_slice_lower = self.patient_masking_info['CT_M_X_-'].iloc[0]
-        x_slices = [x_slice_upper, x_slice_lower]
-        z_slice = self.patient_masking_info['CT_M_Z'].iloc[0]
+        x_slices = [int(x_slice_upper), int(x_slice_lower)]
+        z_slice = int(self.patient_masking_info['CT_M_Z'].iloc[0])
         
         return x_slices, y_slices, z_slice
 
     def mask_CT(self, img_path, new_atlas_img_path, new_masked_img_path):
         
         x_slices, y_slices, z_slice = self.return_masking_info()
-        
+
         img_data, img_affine, img_header = self.get_img_objects(img_path)
 
         img_data_copy = np.array(img_data.copy())
@@ -308,7 +331,7 @@ class Image(MancData):
             z_slice_upper = self.patient_masking_info['CBCT_C_+'].iloc[0]
             z_slice_lower = self.patient_masking_info['CBCT_C_-'].iloc[0]
 
-        return z_slice_upper, z_slice_lower
+        return int(z_slice_upper), int(z_slice_lower)
 
     def calc_Sform_matrix(self, img_path, affine_matrix_path, z_slice):
         
@@ -330,7 +353,6 @@ class Image(MancData):
     def crop_Img(self, img_path, new_img_path, ImgType):
 
         z_slice_upper, z_slice_lower = self.return_cropping_info(ImgType=ImgType)
-
         affine_matrix_path = 'Sform_matrix_path.txt'
 
         # -------> check that it is the lower slice  <-------
@@ -338,23 +360,23 @@ class Image(MancData):
 
         img_data, img_affine, img_header = self.get_img_objects(img_path)
 
-        img_data_copy = img_data[:,:,z_slice_lower[0]:z_slice_upper[1]]
+        img_data_copy = img_data[:,:,z_slice_lower:z_slice_upper]
 
         # save the cropped image 
         NewNiftiObj = nib.Nifti1Image(img_data_copy, img_affine, img_header)
         nib.save(NewNiftiObj, new_img_path) 
 
-        reg_transform = self.niftireg_path + '/reg_transform.exe'
-        UpdSform(reg_transform, new_img_path, affine_matrix_path, new_img_path)
+        UpdSform(self.reg_transform, new_img_path, affine_matrix_path, new_img_path)
 
         os.remove(affine_matrix_path)
 
 
 class GroupwiseRegs(MancData):
 
-    def __init__(self, PatientNo, no_itterations):
+    def __init__(self, PatientNo, no_itterations, structures, base_path, niftireg_path):
         self.PatientNo = PatientNo 
         self.no_itterations = no_itterations 
+        MancData.__init__(self, structures, base_path, niftireg_path, '')
         return
         
     def get_CBCT_relative_timepoints(self):
@@ -564,10 +586,12 @@ class GroupwiseRegs(MancData):
     
 class AtlasRegs(MancData):
 
-    def __init__(self, PatientNo):
-        self.PatientPath = self.base_path + '/' + str(PatientNo) +'/'
+    def __init__(self, PatientNo, structures, base_path, niftireg_path, atlas_path):
+        MancData.__init__(self, structures, base_path, niftireg_path, atlas_path)
+        self.PatientNo = PatientNo
+        self.PatientPath = self.base_path + '/' + str(self.PatientNo) +'/'
         self.PatientCTPath = self.PatientPath + 'pCT/'
-        return
+        
 
     def refactor(self):
         self.ModelSpacePath = self.PatientCTPath + '/model_space/'
@@ -584,14 +608,14 @@ class AtlasRegs(MancData):
 
     def InitAlignment(self):
 
-        float_img = self.PatientCTPath + 'MASKED_pCT.nii.gz'
-        affine_matrix = self.ModelSpacePath + 'InitAlignment_affine.txt'
+        float_img = self.PatientCTPath + 'atlas_MASKED_pCT.nii.gz'
+        affine_matrix = self.ModelSpacePath + 'InitAlignment_atlas.txt'
         resampled_img = self.ModelSpacePath + 'resampled_InitAlignment_pCT.nii.gz'
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
         os.remove(resampled_img)
 
-        img_to_be_updated = self.PatientCTPath + 'MASKED_pCT.nii.gz' ##CHECK WHICH THIS IS
+        img_to_be_updated = self.PatientCTPath + 'atlas_MASKED_pCT.nii.gz' 
         updated_img = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
         UpdSform(self.reg_transform, img_to_be_updated, affine_matrix, updated_img)
         return
@@ -599,36 +623,36 @@ class AtlasRegs(MancData):
     def RigidReg(self):
 
         float_img = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
-        affine_matrix = self.ModelSpacePath + 'atlas_rigid.txt'
+        affine_matrix = self.ModelSpacePath + 'Rigid_atlas.txt'
         resampled_img = self.ModelSpacePath + 'resampled_pCT_atlas_rigid.nii.gz'
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
         os.remove(resampled_img)
         
         img_to_be_updated = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
-        updated_img = self.ModelSpacePath + 'RIGID_pCT.nii.gz'
+        updated_img = self.ModelSpacePath + 'Rigid_pCT.nii.gz'
         UpdSform(self.reg_transform, img_to_be_updated, affine_matrix, updated_img)
 
         return
     
     def AffineReg(self):
 
-        float_img = self.ModelSpacePath + 'RIGID_pCT.nii.gz'
-        affine_matrix = self.ModelSpacePath + 'atlas_affine.txt'
+        float_img = self.ModelSpacePath + 'Rigid_pCT.nii.gz'
+        affine_matrix = self.ModelSpacePath + 'Affine_atlas.txt'
         resampled_img =self.ModelSpacePath + 'resampled_pCT_atlas_affine.nii.gz'
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= False)
         os.remove(resampled_img)
         
-        img_to_be_updated = self.ModelSpacePath + 'RIGID_pCT.nii.gz'
-        updated_img = self.ModelSpacePath + 'AFFINE_pCT.nii.gz'
+        img_to_be_updated = self.ModelSpacePath + 'Rigid_pCT.nii.gz'
+        updated_img = self.ModelSpacePath + 'Affine_pCT.nii.gz'
         UpdSform(self.reg_transform, img_to_be_updated, affine_matrix, updated_img)
         
         return
     
     def DefReg(self):
 
-        float_img = self.ModelSpacePath + 'AFFINE_pCT.nii.gz'
+        float_img = self.ModelSpacePath + 'Affine_pCT.nii.gz'
         resampled_img = self.ModelSpacePath + 'DEF_pCT.nii.gz'
         transformation = self.ModelSpacePath + 'cpp_pCT.nii.gz'
         deformableReg(self.reg_f3d, self.atlas_path, float_img, resampled_img, transformation)
@@ -637,30 +661,29 @@ class AtlasRegs(MancData):
     def Calc_Tatlas(self):
         
         # calculate deformation fields of affine matrixes
-        input_transformation = self.ModelSpacePath + 'InitAlignment_affine.txt'
-        output_transformation = self.ModelSpacePath + 'InitAlignment_affine.nii.gz'
+        input_transformation = self.ModelSpacePath + 'InitAlignment_atlas.txt'
+        output_transformation = self.ModelSpacePath + 'InitAlignment_atlas.nii.gz'
         RigidToDeformation(self.reg_transform, self.atlas_path, input_transformation, output_transformation)
-        input_transformation = self.ModelSpacePath + 'atlas_rigid.txt'
-        output_transformation = self.ModelSpacePath + 'atlas_rigid.nii.gz'
+        input_transformation = self.ModelSpacePath + 'Rigid_atlas.txt'
+        output_transformation = self.ModelSpacePath + 'Rigid_atlas.nii.gz'
         RigidToDeformation(self.reg_transform, self.atlas_path, input_transformation, output_transformation)
-        input_transformation = self.ModelSpacePath + 'atlas_affine.txt'
-        output_transformation = self.ModelSpacePath + 'atlas_affine.nii.gz'
+        input_transformation = self.ModelSpacePath + 'Affine_atlas.txt'
+        output_transformation = self.ModelSpacePath + 'Affine_atlas.nii.gz'
         RigidToDeformation(self.reg_transform, self.atlas_path, input_transformation, output_transformation)
 
-        transformation1 = self.ModelSpacePath + 'atlas_rigid.nii.gz'
-        transformation2 = self.ModelSpacePath + 'InitAlignment_affine.nii.gz'
+        transformation1 = self.ModelSpacePath + 'Rigid_atlas.nii.gz'
+        transformation2 = self.ModelSpacePath + 'InitAlignment_atlas.nii.gz'
         output_transformation1 = self.ModelSpacePath + 'comp1.nii.gz'
         ComposeTransformations(self.reg_transform, self.atlas_path, transformation1, transformation2, output_transformation1)
         os.remove(transformation1)
         os.remove(transformation2)
 
-        transformation1 = self.ModelSpacePath + 'atlas_affine.nii.gz'
+        transformation1 = self.ModelSpacePath + 'Affine_atlas.nii.gz'
         transformation2 = self.ModelSpacePath + 'comp1.nii.gz'
         output_transformation2 = self.ModelSpacePath + 'comp2.nii.gz'
         ComposeTransformations(self.reg_transform, self.atlas_path, transformation1, transformation2, output_transformation2)
         os.remove(transformation1)
         os.remove(transformation2)
-        os.remove(output_transformation1)
 
         transformation1 = self.ModelSpacePath + 'cpp_pCT.nii.gz'
         transformation2 = self.ModelSpacePath + 'comp2.nii.gz'

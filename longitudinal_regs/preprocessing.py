@@ -1,13 +1,12 @@
-
 import os
 import numpy as np 
 from utils import *
 
-patients = np.arange(1,8)# insert specific patients you want to work with 
+patients = np.arange(10,16)# insert specific patients you want to work with 
 #np.arange(0,10)
 reg_resample = 'T:/Poppy/niftireg_executables/reg_resample.exe'
 ref_img = 'T:/Poppy/PatData/MASKED_average_pCT.nii.gz'
-base_path = 'T:/Poppy/PatData/test/'
+base_path = 'T:/Poppy/PatData/test2/'
 
 for patient in patients:
     
