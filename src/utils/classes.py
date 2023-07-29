@@ -553,7 +553,7 @@ class GroupwiseRegs(MancData):
             for itteration in np.arange(0, self.no_itterations):
                 
                 img = self.postprocessing_path + '/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
-                affine_matrix_path = self.results_folder + '/affine_' + str(itteration) + '/comp_affine_'+str(CBCT_timepoint)+'.txt'
+                affine_matrix_path = self.results_folder + '/affine_' + str(itteration+1) + '/comp_affine_'+str(CBCT_timepoint)+'.txt'
 
                 UpdSform(self.reg_transform, img, affine_matrix_path, img)
 
