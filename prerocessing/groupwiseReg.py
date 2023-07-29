@@ -4,22 +4,21 @@ import os
 import pandas as pd
 from functions import * 
 
-structures = ['BRAINSTEM', 'BODY', 'CORD', 'CTVHIGH', 'CTVLOW', 'PAROTIDL', 'PAROTIDR']
 base_path = 'T:/Poppy/PatData/test2/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'
 no_itterations = 2
 # path to the file which contains all patient info
 patients_csv_path = 'T:/Poppy/Anonymisation_Key.csv'
-patients = ['HN_11']
+patients = os.listdir(base_path)
 
 for patient in patients: 
 
         # if a certain path exists and is not empty 
         # check before you do it again 
 
-        ImageObj = Image(patient, structures, base_path, niftireg_path)
+        ImageObj = Image(patient, base_path, niftireg_path)
 
-        GroupwiseReg = GroupwiseRegs(patient,no_itterations, structures, base_path, niftireg_path)
+        GroupwiseReg = GroupwiseRegs(patient,no_itterations, base_path, niftireg_path)
         GroupwiseReg.get_CBCT_relative_timepoints(patients_csv_path)
         GroupwiseReg.refactor()
 
