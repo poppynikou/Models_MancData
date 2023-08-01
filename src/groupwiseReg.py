@@ -1,10 +1,10 @@
 import numpy as np 
-from classes import GroupwiseRegs, MancData, Image
+from utils.classes import GroupwiseRegs, Image
 import os
 import pandas as pd
 from utils.functions import * 
 
-base_path = 'T:/Poppy/PatData/test2/'
+base_path = 'T:/Poppy/PatData/batch2/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'
 no_itterations = 2
 # path to the file which contains all patient info
@@ -12,26 +12,27 @@ patients_csv_path = 'T:/Poppy/Anonymisation_Key.csv'
 patients = os.listdir(base_path)
 
 for patient in patients: 
+    
+        if patient[0:3] == 'HN_':
+            # if a certain path exists and is not empty 
+            # check before you do it again 
+            ImageObj = Image(patient, base_path, niftireg_path)
 
-        # if a certain path exists and is not empty 
-        # check before you do it again 
-        ImageObj = Image(patient, base_path, niftireg_path)
+            GroupwiseReg = GroupwiseRegs(patient,no_itterations, base_path, niftireg_path)
+            GroupwiseReg.get_CBCT_relative_timepoints(patients_csv_path)
+            GroupwiseReg.refactor()
 
-        GroupwiseReg = GroupwiseRegs(patient,no_itterations, base_path, niftireg_path)
-        GroupwiseReg.get_CBCT_relative_timepoints(patients_csv_path)
-        GroupwiseReg.refactor()
+            for itteration in np.arange(0, no_itterations):
 
-        for itteration in np.arange(0, no_itterations):
+                GroupwiseReg.set__itteration(itteration)
+                GroupwiseReg.rigidGroupReg()
+                GroupwiseReg.avgAffine()
+                GroupwiseReg.invAffine()
+                GroupwiseReg.compAffine()
+                GroupwiseReg.resampleImages()
+                GroupwiseReg.avgImage()
 
-            GroupwiseReg.set__itteration(itteration)
-            GroupwiseReg.rigidGroupReg()
-            GroupwiseReg.avgAffine()
-            GroupwiseReg.invAffine()
-            GroupwiseReg.compAffine()
-            GroupwiseReg.resampleImages()
-            GroupwiseReg.avgImage()
-
-        GroupwiseReg.UpdateGroupSform()
-        GroupwiseReg.rigidpCTReg()
-        GroupwiseReg.UpdateSform()
+            GroupwiseReg.UpdateGroupSform()
+            GroupwiseReg.rigidpCTReg()
+            GroupwiseReg.UpdateSform()
 

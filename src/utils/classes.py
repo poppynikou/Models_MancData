@@ -3,7 +3,7 @@ import shutil
 import pandas as pd
 import nibabel as nib 
 import numpy as np 
-from functions import *
+from utils.functions import *
 
 class MancData():
     
@@ -286,6 +286,38 @@ class Image(MancData):
         z_slice = int(self.patient_masking_info['CT_M_Z'].iloc[0])
         
         return x_slices, y_slices, z_slice
+    
+    def create_mouth_mask(self):
+        
+        path_to_body_mask = self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_BODY.nii.gz'
+        path_to_mouth = self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_MOUTH.nii.gz'
+        path_to_mouth_mask = self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_MOUTH_MASK.nii.gz'
+        
+        img_data_body, img_affine_body, img_header_body = self.get_img_objects(path_to_body_mask)
+        img_data_body_copy = img_data_body.copy()
+        (_,y,z) = np.shape(img_data_body_copy)
+        del _
+        
+        img_data_mouth, _, _ = self.get_img_objects(path_to_mouth)
+        del _
+        
+        img_data_mouth = np.array(img_data_mouth, dtype=np.bool8)
+        z_slices = np.sum(np.sum(img_data_mouth, axis =0), axis=0)
+        nonzero_z_slices = np.nonzero(z_slices)
+        
+        img_data_body_copy[:,:,0:nonzero_z_slices[0][0]] = False
+        img_data_body_copy[:,:,nonzero_z_slices[0][-1]:z] = False
+
+        for z_slice in nonzero_z_slices[0]:
+
+            y_slices = np.sum(np.squeeze(img_data_mouth[:,:,z_slice]), axis =0)
+            nonzero_y_slices = np.nonzero(y_slices)[0][-1]
+            img_data_body_copy[:,nonzero_y_slices:y,z_slice] = False
+            
+        NewNiftiObj = nib.Nifti1Image(img_data_body_copy, img_affine_body, img_header_body)
+        nib.save(NewNiftiObj, path_to_mouth_mask)
+    
+            
 
     def mask_CT(self, img_path, new_atlas_img_path, new_masked_img_path):
         
@@ -298,6 +330,13 @@ class Image(MancData):
 
         img_data_copy[:,y_slices[0]:y,:] = np.NaN
         img_data_copy[:,0:y_slices[1],:] = np.NaN
+        
+        # mask out the mouth region 
+        self.create_mouth_mask()
+        img_data_mouth, _, _ = self.get_img_objects(img_path)
+        del _
+        img_data_mouth= np.array(img_data_mouth, dtype = np.bool8)
+        img_data_copy[img_data_mouth] = np.NaN
 
         newNiftiObj = nib.Nifti1Image(img_data_copy, img_affine, img_header)
         nib.save(newNiftiObj, new_masked_img_path)
@@ -358,8 +397,11 @@ class Image(MancData):
         self.calc_Sform_matrix(img_path, affine_matrix_path, z_slice_lower)
 
         img_data, img_affine, img_header = self.get_img_objects(img_path)
-
-        img_data_copy = img_data[:,:,z_slice_lower:z_slice_upper]
+        
+        if ImgType == 'CT':
+            img_data_copy = img_data[:,:,z_slice_lower:z_slice_upper]
+        elif ImgType == 'CBCT':
+            img_data_copy = img_data[:,z_slice_lower:z_slice_upper, :]
 
         # save the cropped image 
         NewNiftiObj = nib.Nifti1Image(img_data_copy, img_affine, img_header)
