@@ -2,7 +2,7 @@ import os
 from src.utils.classes import *
 
 
-base_path = 'T:/Poppy/PatData/batch2/'
+base_path = 'T:/Poppy/PatData/batch3/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'
 atlas_path = ''
 
@@ -88,16 +88,13 @@ for patient in patients:#
                     #ImgObj.crop_Img(masked_img_path, cropped_img_path, ImgType = 'CT')
                 
                 
-                
+                '''
                 if name[0:4] == 'CBCT':
-                    print(name)
-                    #ImgObj.convert_to_float(file_path)
+                    ImgObj.convert_to_float(file_path)
                     masked_img_path =base_path + str(PatientNo) + '/'+ str(name[:-7])+ '/MASKED_'+str(name)
-                    if os.path.exists(masked_img_path):
-                        os.remove(masked_img_path)
                     ImgObj.mask_CBCT(file_path, masked_img_path)
                     cropped_img_path = base_path + str(PatientNo) + '/'+ str(name[:-7])+'/cropped_'+str(name)
-                    if os.path.exists(cropped_img_path):
-                        os.remove(cropped_img_path)
                     ImgObj.crop_Img(masked_img_path, cropped_img_path, ImgType = 'CBCT')
+                '''
+                
           
