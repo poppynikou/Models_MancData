@@ -2,7 +2,7 @@ import os
 from utils.classes import *
 
 
-base_path = 'T:/Poppy/PatData/batch2/'
+base_path = 'T:/Poppy/PatData/batch1/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'
 atlas_path = ''
 
@@ -18,13 +18,10 @@ flip_record.write('Patient No_Left_CTV_Voxels No_Right_CTV_Voxels Difference Fli
 
 masking_path = 'C:/Users/Poppy/Documents/Model_Development/src/meta_info.csv'
 
-for patient in patients:#
-    
-        PatientNo = patient
-        print(PatientNo)
+for patient in patients:#  
 
         # check if the preprocessing for that patient has already been done
-        '''
+        
         PatientID = patient
         
         PatientObj = PatientData(PatientID, base_path, niftireg_path)
@@ -37,15 +34,14 @@ for patient in patients:#
         PatientObj.refactor_pCT()
         PatientObj.refactor_structures()
         PatientObj.refactor_CBCTs()
-        '''
+        
         # create image class 
         ImgObj = Image(PatientNo, base_path, niftireg_path)
         ImgObj.read_meta_info(masking_path)
         
         # find patient folder to search through
-        #patient_path = PatientObj.get_patient_folder()
-        patient_path = base_path + '/' + str(patient)
-        '''
+        patient_path = PatientObj.get_patient_folder()
+        
         # find all files within a directory which are nifti files
         for path, subdirs, files in os.walk(patient_path):
             for name in files:
@@ -55,7 +51,7 @@ for patient in patients:#
                     ImgObj.zip_nifti(file_path)
 
         flip_img_Bool = ImgObj.flip_img_Bool(flip_record)
-       '''
+       
         
         # preprocess the images 
         for path, subdirs, files in os.walk(patient_path):
@@ -63,18 +59,18 @@ for patient in patients:#
 
                 file_path = path + '/' + name 
 
-                '''
+                
                 if flip_img_Bool:
                     ImgObj.flip_img(file_path)
                     ImgObj.rename_parotid(name, flip = True)
                 else:
                     ImgObj.rename_parotid(name, flip = False)
-                '''
+                
                 
                 if name[0:3] == 'pCT':
-                    #ImgObj.convert_to_float(file_path)
-                    #ImgObj.rescale_HU(file_path)
-                    #ImgObj.clip_HU(file_path)
+                    ImgObj.convert_to_float(file_path)
+                    ImgObj.rescale_HU(file_path)
+                    ImgObj.clip_HU(file_path)
                     atlas_img_path = base_path + str(PatientNo) + '/pCT/atlas_MASKED_pCT.nii.gz'
                     masked_img_path = base_path + str(PatientNo) + '/pCT/MASKED_pCT.nii.gz'
                     ImgObj.mask_CT(file_path, atlas_img_path, masked_img_path)
@@ -82,7 +78,7 @@ for patient in patients:#
                     ImgObj.crop_Img(masked_img_path, cropped_img_path, ImgType = 'CT')
                 
                 if name[0:4] == 'CBCT':
-                    #ImgObj.convert_to_float(file_path)
+                    ImgObj.convert_to_float(file_path)
                     masked_img_path = base_path + str(PatientNo) + '/'+ str(name[:-7])+'/MASKED_'+str(name)
                     ImgObj.mask_CBCT(file_path, masked_img_path)
                     cropped_img_path = base_path + str(PatientNo) + '/'+ str(name[:-7])+'/cropped_'+str(name)

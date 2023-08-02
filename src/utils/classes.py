@@ -3,7 +3,7 @@ import shutil
 import pandas as pd
 import nibabel as nib 
 import numpy as np 
-from src.utils.functions import *
+from utils.functions import *
 
 class MancData():
     
