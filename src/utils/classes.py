@@ -3,7 +3,7 @@ import shutil
 import pandas as pd
 import nibabel as nib 
 import numpy as np 
-from utils.functions import *
+from src.utils.functions import *
 
 class MancData():
     
@@ -332,16 +332,27 @@ class Image(MancData):
         img_data_copy[:,0:y_slices[1],:] = np.NaN
         
         # mask out the mouth region 
-        self.create_mouth_mask()
-        img_data_mouth, _, _ = self.get_img_objects(img_path)
-        del _
-        img_data_mouth= np.array(img_data_mouth, dtype = np.bool8)
-        img_data_copy[img_data_mouth] = np.NaN
+        if os.path.exists(self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_MOUTH.nii.gz'):
+            self.create_mouth_mask()
+            img_data_mouth, _, _ = self.get_img_objects(self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_MOUTH_MASK.nii.gz')
+            del _
+            img_data_mouth= np.array(img_data_mouth, dtype = np.bool8)
+            img_data_copy[img_data_mouth] = np.NaN
+        else:
+            print('Patient ' + str(self.PatientNo) + ' no Mouth Mask')
 
         newNiftiObj = nib.Nifti1Image(img_data_copy, img_affine, img_header)
         nib.save(newNiftiObj, new_masked_img_path)
 
-        
+        # mask out the mouth region 
+        if os.path.exists(self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_CTVHIGH.nii.gz'):
+            img_data_ctvhigh, _, _ = self.get_img_objects(self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_CTVHIGH.nii.gz')
+            del _
+            img_data_ctvhigh= np.array(img_data_ctvhigh, dtype = np.bool8)
+            img_data_copy[img_data_ctvhigh] = np.NaN
+        else:
+            print('Patient ' + str(self.PatientNo) + ' no high dose CTV Mask')
+            
         img_data_copy[x_slices[0]:x,:,:] = np.NaN
         img_data_copy[0:x_slices[1],:,:] = np.NaN
         img_data_copy[:,:,z_slice:z] = np.NaN
@@ -360,6 +371,7 @@ class Image(MancData):
         NewNiftiObj = nib.Nifti1Image(img_data_copy, img_affine, img_header)
        
         nib.save(NewNiftiObj, new_img_path)
+        
 
     def return_cropping_info(self, ImgType):
 
@@ -743,5 +755,10 @@ class AtlasRegs(MancData):
         float_img = self.PatientCTPath + 'MASKED_pCT.nii.gz'
         resampled_img = self.PatientUCLHRegsPath + '/MASKED_pCT.nii.gz'
         resampleImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
-
         
+        
+        float_img = self.PatientCTPath + 'BIN_MOUTH_MASK.nii.gz'
+        if os.path.exists(float_img):
+            resampled_img = self.PatientUCLHRegsPath + '/BIN_MOUTH_MASK.nii.gz'
+            resampleBINImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
+

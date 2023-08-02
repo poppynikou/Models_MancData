@@ -1,5 +1,5 @@
 import os
-from utils.classes import *
+from src.utils.classes import *
 
 
 base_path = 'T:/Poppy/PatData/batch2/'
@@ -19,6 +19,8 @@ flip_record.write('Patient No_Left_CTV_Voxels No_Right_CTV_Voxels Difference Fli
 masking_path = 'C:/Users/Poppy/Documents/Model_Development/src/meta_info.csv'
 
 for patient in patients:#
+    
+    if patient[0:3] == 'HN_':
     
         PatientNo = patient
         print(PatientNo)
@@ -53,6 +55,8 @@ for patient in patients:#
                 if name[-4:] == '.nii':
                     # zip all nifty data 
                     ImgObj.zip_nifti(file_path)
+        
+    
 
         flip_img_Bool = ImgObj.flip_img_Bool(flip_record)
        '''
@@ -60,17 +64,19 @@ for patient in patients:#
         # preprocess the images 
         for path, subdirs, files in os.walk(patient_path):
             for name in files:
-
+                
                 file_path = path + '/' + name 
-
+                
                 '''
-                if flip_img_Bool:
+                 if flip_img_Bool:
                     ImgObj.flip_img(file_path)
                     ImgObj.rename_parotid(name, flip = True)
                 else:
                     ImgObj.rename_parotid(name, flip = False)
+                    
                 '''
-                
+               
+                    
                 if name[0:3] == 'pCT':
                     #ImgObj.convert_to_float(file_path)
                     #ImgObj.rescale_HU(file_path)
@@ -78,18 +84,20 @@ for patient in patients:#
                     atlas_img_path = base_path + str(PatientNo) + '/pCT/atlas_MASKED_pCT.nii.gz'
                     masked_img_path = base_path + str(PatientNo) + '/pCT/MASKED_pCT.nii.gz'
                     ImgObj.mask_CT(file_path, atlas_img_path, masked_img_path)
-                    cropped_img_path = base_path + str(PatientNo) + '/pCT/cropped_pCT.nii.gz'
-                    ImgObj.crop_Img(masked_img_path, cropped_img_path, ImgType = 'CT')
+                    #cropped_img_path = base_path + str(PatientNo) + '/pCT/cropped_pCT.nii.gz'
+                    #ImgObj.crop_Img(masked_img_path, cropped_img_path, ImgType = 'CT')
+                
+                
                 
                 if name[0:4] == 'CBCT':
+                    print(name)
                     #ImgObj.convert_to_float(file_path)
-                    masked_img_path = base_path + str(PatientNo) + '/'+ str(name[:-7])+'/MASKED_'+str(name)
+                    masked_img_path =base_path + str(PatientNo) + '/'+ str(name[:-7])+ '/MASKED_'+str(name)
+                    if os.path.exists(masked_img_path):
+                        os.remove(masked_img_path)
                     ImgObj.mask_CBCT(file_path, masked_img_path)
                     cropped_img_path = base_path + str(PatientNo) + '/'+ str(name[:-7])+'/cropped_'+str(name)
+                    if os.path.exists(cropped_img_path):
+                        os.remove(cropped_img_path)
                     ImgObj.crop_Img(masked_img_path, cropped_img_path, ImgType = 'CBCT')
-
-                
-                
-               
-
-
+          

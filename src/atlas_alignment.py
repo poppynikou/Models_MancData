@@ -1,4 +1,4 @@
-from classes import *
+from utils.classes import *
 from utils.functions import * 
 
 base_path = 'T:/Poppy/PatData/test2/'
