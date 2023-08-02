@@ -743,15 +743,13 @@ class AtlasRegs(MancData):
         os.remove(transformation2)
 
         return
-    
 
 
-    def ResampleImgs(self):
+    def ResampleImgs(self, CBCT_timepoints):
 
         # function which uses T_model to resample all patient images into the model space
         T_model = self.PatientPath + 'T_model.nii.gz'
         
-
         float_img = self.PatientCTPath + 'MASKED_pCT.nii.gz'
         resampled_img = self.PatientUCLHRegsPath + '/MASKED_pCT.nii.gz'
         resampleImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
@@ -762,3 +760,56 @@ class AtlasRegs(MancData):
             resampled_img = self.PatientUCLHRegsPath + '/BIN_MOUTH_MASK.nii.gz'
             resampleBINImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
 
+        for CBCT_timepoint in CBCT_timepoints:
+
+            CBCT_RegsPath = self.PatientUCLHRegsPath + '/CBCT_' + str(CBCT_timepoint)
+            if not os.path.exists(CBCT_RegsPath):
+                os.mkdir(CBCT_RegsPath)
+ 
+            float_img =  str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_pCT/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
+            resampled_img = CBCT_RegsPath + '/MASKED_CBCT.nii.gz'
+            resampleImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
+
+        
+
+
+class DefromableRegs(MancData):
+
+    def __init__(self, PatientNo, base_path, niftireg_path):
+        MancData.__init__(self, base_path, niftireg_path, '')
+        self.PatientNo = PatientNo
+        self.PatientUCLHRegsPath = self.base_path + '/UCLHMODELSPACE_REGS/' + str(self.PatientNo)
+
+    def set__CBCTtimepoint(self, CBCT_timepoint):
+
+        self.CBCT_timepoint = CBCT_timepoint
+
+
+    def mask_CBCT(self):
+
+        input_img = self.PatientUCLHRegsPath + '/CBCT_' + str(self.CBCT_timepoint) + '/MASKED_CBCT.nii.gz'
+        mouth_mask = self.PatientUCLHRegsPath + '/BIN_MOUTH_MASK.nii.gz'
+        if os.path.exists(mouth_mask):
+            img_data, img_affine, img_header = self.get_img_objects(input_img)
+            img_data_copy = np.array(img_data.copy(), dtype = np.float32)
+
+            img_data_mask, _, _ = self.get_img_objects(mouth_mask)
+            img_data_mask = np.array(img_data_mask, dtype = np.bool8)
+            img_data_copy[img_data_mask] = np.NaN
+
+            NewNiftiObj = nib.Nifti1Image(img_data_copy, img_affine, img_header)
+            NewNiftiObj.set_data_dtype(np.float32)
+            nib.save(NewNiftiObj, input_img)
+
+        else:
+            pass
+
+
+    def DefReg(self):
+        
+        float_img = self.PatientUCLHRegsPath + '/MASKED_pCT.nii.gz'
+        ref_img = self.PatientUCLHRegsPath + '/CBCT_' + str(self.CBCT_timepoint) + '/MASKED_CBCT.nii.gz'
+        resampled_img = self.PatientUCLHRegsPath + '/CBCT_' + str(self.CBCT_timepoint) + '/DEF_CBCT.nii.gz'
+        cpp = self.PatientUCLHRegsPath + '/CBCT_' + str(self.CBCT_timepoint) +'/cpp_CBCT.nii.gz'
+
+        deformableReg(self.reg_f3d, ref_img, float_img, resampled_img, cpp)
