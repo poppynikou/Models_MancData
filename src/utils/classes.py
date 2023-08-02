@@ -3,7 +3,7 @@ import shutil
 import pandas as pd
 import nibabel as nib 
 import numpy as np 
-from utils.functions import *
+from src.utils.functions import *
 
 class MancData():
     
@@ -464,13 +464,13 @@ class GroupwiseRegs(MancData):
             # cropped imgs 
             source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/cropped_CBCT_' +str(CBCT_timepoint) + '.nii.gz'
             destination = self.results_folder + 'affine_0/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
-            #shutil.copy(source, destination)
+            shutil.copy(source, destination)
 
         for CBCT_timepoint in self.CBCT_relative_timepoints:
             # full imgs 
             source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/CBCT_' +str(CBCT_timepoint) + '.nii.gz'
             destination = self.postprocessing_path + '/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
-            #shutil.copy(source, destination)
+            shutil.copy(source, destination)
     
     def set_itteration(self, itteration):
 

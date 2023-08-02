@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from src.utils.functions import * 
 
-base_path = 'T:/Poppy/PatData/batch2/'
+base_path = 'T:/Poppy/PatData/batch3/'
 niftireg_path = 'T:/Poppy/niftireg_executables/'
 no_itterations = 2
 # path to the file which contains all patient info
