@@ -4,6 +4,8 @@ import pandas as pd
 import nibabel as nib 
 import numpy as np 
 from functions import *
+
+
 class MancData():
     
     def __init__(self, base_path, niftireg_path, atlas_path):
