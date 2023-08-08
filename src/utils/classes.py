@@ -286,38 +286,7 @@ class Image(MancData):
         z_slice = int(self.patient_masking_info['CT_M_Z'].iloc[0])
         
         return x_slices, y_slices, z_slice
-    
-    def create_mouth_mask(self):
-        
-        path_to_body_mask = self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_BODY.nii.gz'
-        path_to_mouth = self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_MOUTH.nii.gz'
-        path_to_mouth_mask = self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_MOUTH_MASK.nii.gz'
-        
-        img_data_body, img_affine_body, img_header_body = self.get_img_objects(path_to_body_mask)
-        img_data_body_copy = img_data_body.copy()
-        (_,y,z) = np.shape(img_data_body_copy)
-        del _
-        
-        img_data_mouth, _, _ = self.get_img_objects(path_to_mouth)
-        del _
-        
-        img_data_mouth = np.array(img_data_mouth, dtype=np.bool8)
-        z_slices = np.sum(np.sum(img_data_mouth, axis =0), axis=0)
-        nonzero_z_slices = np.nonzero(z_slices)
-        
-        img_data_body_copy[:,:,0:nonzero_z_slices[0][0]] = False
-        img_data_body_copy[:,:,nonzero_z_slices[0][-1]:z] = False
-
-        for z_slice in nonzero_z_slices[0]:
-
-            y_slices = np.sum(np.squeeze(img_data_mouth[:,:,z_slice]), axis =0)
-            nonzero_y_slices = np.nonzero(y_slices)[0][-1]
-            img_data_body_copy[:,nonzero_y_slices:y,z_slice] = False
-            
-        NewNiftiObj = nib.Nifti1Image(img_data_body_copy, img_affine_body, img_header_body)
-        nib.save(NewNiftiObj, path_to_mouth_mask)
-    
-            
+       
 
     def mask_CT(self, img_path, new_atlas_img_path, new_masked_img_path):
         
@@ -330,16 +299,6 @@ class Image(MancData):
 
         img_data_copy[:,y_slices[0]:y,:] = np.NaN
         img_data_copy[:,0:y_slices[1],:] = np.NaN
-        
-        # mask out the mouth region 
-        if os.path.exists(self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_MOUTH.nii.gz'):
-            self.create_mouth_mask()
-            img_data_mouth, _, _ = self.get_img_objects(self.base_path + '/' + str(self.PatientNo) + '/pCT/BIN_MOUTH_MASK.nii.gz')
-            del _
-            img_data_mouth= np.array(img_data_mouth, dtype = np.bool8)
-            img_data_copy[img_data_mouth] = np.NaN
-        else:
-            print('Patient ' + str(self.PatientNo) + ' no Mouth Mask')
 
         newNiftiObj = nib.Nifti1Image(img_data_copy, img_affine, img_header)
         nib.save(newNiftiObj, new_masked_img_path)
@@ -462,13 +421,13 @@ class GroupwiseRegs(MancData):
 
         for CBCT_timepoint in self.CBCT_relative_timepoints:
             # cropped imgs 
-            source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/cropped_CBCT_' +str(CBCT_timepoint) + '.nii.gz'
+            source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/MASKED_CBCT_' +str(CBCT_timepoint) + '.nii.gz'
             destination = self.results_folder + 'affine_0/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
             shutil.copy(source, destination)
 
         for CBCT_timepoint in self.CBCT_relative_timepoints:
             # full imgs 
-            source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/CBCT_' +str(CBCT_timepoint) + '.nii.gz'
+            source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/MASKED_CBCT_' +str(CBCT_timepoint) + '.nii.gz'
             destination = self.postprocessing_path + '/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
             shutil.copy(source, destination)
     
@@ -614,7 +573,7 @@ class GroupwiseRegs(MancData):
 
     def rigidpCTReg(self):
 
-        ref_img = self.results_folder = str(self.base_path) + '/' + str(self.PatientNo) + '/pCT/cropped_pCT.nii.gz'
+        ref_img = self.results_folder = str(self.base_path) + '/' + str(self.PatientNo) + '/pCT/MASKED_pCT.nii.gz'
         float_img = self.resampled_imgs[0]
         transformation = self.CBCT_pCT_path + '/affine.txt'
         resampled_img = self.CBCT_pCT_path + '/CBCT_0.nii.gz'
@@ -754,12 +713,6 @@ class AtlasRegs(MancData):
         resampled_img = self.PatientUCLHRegsPath + '/MASKED_pCT.nii.gz'
         resampleImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
         
-        
-        float_img = self.PatientCTPath + 'BIN_MOUTH_MASK.nii.gz'
-        if os.path.exists(float_img):
-            resampled_img = self.PatientUCLHRegsPath + '/BIN_MOUTH_MASK.nii.gz'
-            resampleBINImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
-
         for CBCT_timepoint in CBCT_timepoints:
 
             CBCT_RegsPath = self.PatientUCLHRegsPath + '/CBCT_' + str(CBCT_timepoint)
@@ -783,26 +736,6 @@ class DefromableRegs(MancData):
     def set__CBCTtimepoint(self, CBCT_timepoint):
 
         self.CBCT_timepoint = CBCT_timepoint
-
-
-    def mask_CBCT(self):
-
-        input_img = self.PatientUCLHRegsPath + '/CBCT_' + str(self.CBCT_timepoint) + '/MASKED_CBCT.nii.gz'
-        mouth_mask = self.PatientUCLHRegsPath + '/BIN_MOUTH_MASK.nii.gz'
-        if os.path.exists(mouth_mask):
-            img_data, img_affine, img_header = self.get_img_objects(input_img)
-            img_data_copy = np.array(img_data.copy(), dtype = np.float32)
-
-            img_data_mask, _, _ = self.get_img_objects(mouth_mask)
-            img_data_mask = np.array(img_data_mask, dtype = np.bool8)
-            img_data_copy[img_data_mask] = np.NaN
-
-            NewNiftiObj = nib.Nifti1Image(img_data_copy, img_affine, img_header)
-            NewNiftiObj.set_data_dtype(np.float32)
-            nib.save(NewNiftiObj, input_img)
-
-        else:
-            pass
 
 
     def DefReg(self):
