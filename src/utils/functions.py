@@ -17,6 +17,7 @@ def rigidReg(reg_aladin_path, ref_img, float_img, affine_matrix, resampled_img, 
         command = basic_command
     os.system(command)
     
+
 def avgAff(reg_average_path, average_affine_path, affine_matrixes):
 
     '''
@@ -44,7 +45,12 @@ def compAff(reg_transform_path, ref_img, ref_affine, affine_matrix, comp_matrix)
 
 def resampleImg(reg_resample_path, ref_img, float_img, transformation, resampled_img):
 
-    command = reg_resample_path + ' -ref ' + ref_img +  ' -flo ' + float_img + ' -trans ' + transformation + ' -res ' + resampled_img + ' -inter 3 -omp 10 -pad nan'
+    command = reg_resample_path + ' -ref ' + ref_img +  ' -flo ' + float_img + ' -trans ' + transformation + ' -res ' + resampled_img + ' -inter 3 -omp 12 -pad nan'
+    os.system(command)
+    
+def resampleBINImg(reg_resample_path, ref_img, float_img, transformation, resampled_img):
+    
+    command = reg_resample_path + ' -ref ' + ref_img +  ' -flo ' + float_img + ' -trans ' + transformation + ' -res ' + resampled_img + ' -inter 1 -omp 12 -pad 0'
     os.system(command)
 
 def deformableReg(reg_f3d_path, ref_img, float_img, resampled_img, transformation):
@@ -66,3 +72,5 @@ def ComposeTransformations(reg_transform_path, ref_img, transformation1, transfo
     
     command = reg_transform_path + ' -ref ' + ref_img + ' -comp ' + transformation1 + ' ' + transformation2 + ' '  + output_transformation
     os.system(command)
+    
+    
