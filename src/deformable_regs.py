@@ -8,6 +8,12 @@ patients = np.arange(1,8)
 reg_f3d = 'T:/Poppy/niftireg_executables/reg_f3d.exe'
 base_path = 'T:/Poppy/PatData/test/'
 
+# preprocessing
+#1. mask out the mouth in the CBCTs
+#2. create directories to store the results 
+#3. save a file to onedrive to tell you each time a registration is completed 
+
+
 for patient in patients:
     
     patient_path = base_path + '/UCLHMODELSPACE_REGS/HN_' + str(patient)

@@ -4,6 +4,7 @@ import pandas as pd
 import nibabel as nib 
 import numpy as np 
 from functions import *
+from scipy.ndimage.morphology import binary_dilation
 
 class MancData():
     
@@ -287,15 +288,20 @@ class Image(MancData):
         
         return x_slices, y_slices, z_slice
 
-    def mask_CT(self, img_path, new_atlas_img_path, new_masked_img_path):
+    def mask_CT(self, pCT_path, new_atlas_img_path, new_masked_img_path):
         
+        '''
+        pCT_path: path in which the pCT is found 
+        '''
+
         x_slices, y_slices, z_slice = self.return_masking_info()
 
-        img_data, img_affine, img_header = self.get_img_objects(img_path)
+        img_data, img_affine, img_header = self.get_img_objects(pCT_path + '/pCT.nii.gz')
 
         img_data_copy = np.array(img_data.copy())
         (x,y,z) = np.shape(img_data_copy)
 
+        # mask out the couch 
         img_data_copy[:,y_slices[0]:y,:] = np.NaN
         img_data_copy[:,0:y_slices[1],:] = np.NaN
 
@@ -314,6 +320,7 @@ class Image(MancData):
 
         img_data, img_affine, img_header = self.get_img_objects(img_path)
         img_data_copy = img_data.copy()
+
         # index at top corner 
         masking_HU = img_data_copy[0,0,0]
         img_data_copy[img_data_copy == masking_HU] = np.NaN
@@ -701,5 +708,11 @@ class AtlasRegs(MancData):
         float_img = self.PatientCTPath + 'MASKED_pCT.nii.gz'
         resampled_img = self.PatientUCLHRegsPath + '/MASKED_pCT.nii.gz'
         resampleImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
+
+        float_img = self.PatientCTPath + 'BIN_MOUTH_MASK.nii.gz'
+        resampled_img = self.PatientUCLHRegsPath + '/BIN_MOUTH_MASK.nii.gz'
+        resampleImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
+
+
 
         
