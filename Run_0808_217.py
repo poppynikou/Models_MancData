@@ -58,9 +58,3 @@ for patient in patients:
                     
                     LongitudinalRegs.set__CBCTtimepoint(CBCT_timepoint)
                     LongitudinalRegs.DefReg()
-                
-                
-            
-                
-
-                

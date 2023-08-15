@@ -505,7 +505,7 @@ class GroupwiseRegs(MancData):
 
             rigidReg(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
 
-            #os.remove(resampled_img)
+            os.remove(resampled_img)
 
             self.test__rigidReg()
 
@@ -657,7 +657,7 @@ class AtlasRegs(MancData):
         resampled_img = self.ModelSpacePath + 'resampled_InitAlignment_pCT.nii.gz'
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
-        #os.remove(resampled_img)
+        os.remove(resampled_img)
 
         self.test__RigidReg(affine_matrix)
 
@@ -673,7 +673,7 @@ class AtlasRegs(MancData):
         resampled_img = self.ModelSpacePath + 'resampled_pCT_atlas_rigid.nii.gz'
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
-        #os.remove(resampled_img)
+        os.remove(resampled_img)
 
         self.test__RigidReg(affine_matrix)
         
@@ -690,7 +690,7 @@ class AtlasRegs(MancData):
         resampled_img =self.ModelSpacePath + 'resampled_pCT_atlas_affine.nii.gz'
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= False)
-        #os.remove(resampled_img)
+        os.remove(resampled_img)
 
         self.test__RigidReg(affine_matrix)
         
@@ -725,21 +725,21 @@ class AtlasRegs(MancData):
         transformation2 = self.ModelSpacePath + 'InitAlignment_atlas.nii.gz'
         output_transformation1 = self.ModelSpacePath + 'comp1.nii.gz'
         ComposeTransformations(self.reg_transform, self.atlas_path, transformation1, transformation2, output_transformation1)
-        #os.remove(transformation1)
-        #os.remove(transformation2)
+        os.remove(transformation1)
+        os.remove(transformation2)
 
         transformation1 = self.ModelSpacePath + 'Affine_atlas.nii.gz'
         transformation2 = self.ModelSpacePath + 'comp1.nii.gz'
         output_transformation2 = self.ModelSpacePath + 'comp2.nii.gz'
         ComposeTransformations(self.reg_transform, self.atlas_path, transformation1, transformation2, output_transformation2)
-        #os.remove(transformation1)
-        #os.remove(transformation2)
+        os.remove(transformation1)
+        os.remove(transformation2)
 
         transformation1 = self.ModelSpacePath + 'cpp_pCT.nii.gz'
         transformation2 = self.ModelSpacePath + 'comp2.nii.gz'
         output_transformation3 = self.PatientPath + 'T_model.nii.gz'
         ComposeTransformations(self.reg_transform, self.atlas_path, transformation1, transformation2, output_transformation3)
-        #os.remove(transformation2)
+        os.remove(transformation2)
 
         return
 

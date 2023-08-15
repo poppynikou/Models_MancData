@@ -15,6 +15,10 @@ atlas_path = 'T:/Poppy/PatData/MASKED_average_pCT.nii.gz'
 for patient in patients: 
     
         if patient[0:3] == 'HN_':
+            
+            print(patient)
+            
+            try:
 
                 # if a certain path exists and is not empty 
                 # check before you do it again 
@@ -39,6 +43,10 @@ for patient in patients:
                 GroupwiseReg.rigidpCTReg()
                 GroupwiseReg.UpdateSform()
                 
+            except:
+                pass
+                
+                '''
                 AtlasAlignment = AtlasRegs(patient, base_path, niftireg_path, atlas_path)
 
                 AtlasAlignment.refactor()
@@ -53,12 +61,15 @@ for patient in patients:
                 AtlasAlignment.ResampleImgs(CBCT_relative_timepoints)
                 
                 LongitudinalRegs = DefromableRegs(patient, base_path, niftireg_path)
-
+           
                 for CBCT_timepoint in CBCT_relative_timepoints[-2:]:
                     
                     LongitudinalRegs.set__CBCTtimepoint(CBCT_timepoint)
                     LongitudinalRegs.DefReg()
+                '''
                 
+                
+            
                 
             
                 
