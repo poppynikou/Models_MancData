@@ -17,10 +17,11 @@ class MancData():
         self.reg_f3d = niftireg_path +'/reg_f3d.exe'
         self.atlas_path = atlas_path
 
-    def create_log_file(self, patient):
+    def create_log_file(self):
 
         self.path_to_log_file = self.base_path + '/log.txt'
-        file = open(self.path_to_log_file,"w+")
+        if not os.path.exists(self.path_to_log_file):
+            open(self.path_to_log_file,"w+")
     
     def write_to_logfile(self, text):
         file = open(self.path_to_log_file,"w+")
@@ -397,7 +398,8 @@ class GroupwiseRegs(MancData):
         self.PatientNo = PatientNo 
         self.no_itterations = no_itterations 
         MancData.__init__(self, base_path, niftireg_path, '')
-        MancData.write_to_logfile('Groupwise Registration Patient ' + str(self.PatientNo))
+        self.create_log_file()
+        self.write_to_logfile('Groupwise Registration Patient ' + str(self.PatientNo))
         return
         
     def get_CBCT_relative_timepoints(self, anonymisation_key_path):
@@ -518,7 +520,7 @@ class GroupwiseRegs(MancData):
             matrix = np.identity(4)
             np.savetxt(affine_matrix_path, matrix)
 
-            MancData.write_to_logfile('Rigid Registration saved as identity: ' + str(affine_matrix_path))
+            self.write_to_logfile('Rigid Registration saved as identity: ' + str(affine_matrix_path))
 
 
     def avgAffine(self):
@@ -625,7 +627,7 @@ class AtlasRegs(MancData):
         self.PatientNo = PatientNo
         self.PatientPath = self.base_path + '/' + str(self.PatientNo) +'/'
         self.PatientCTPath = self.PatientPath + 'pCT/'
-        MancData.write_to_logfile('Atlas Registration Patient ' + str(self.PatientNo))
+        self.write_to_logfile('Atlas Registration Patient ' + str(self.PatientNo))
         
 
     def refactor(self):
@@ -647,7 +649,7 @@ class AtlasRegs(MancData):
             matrix = np.identity(4)
             np.savetxt(affine_matrix_path, matrix)
 
-            MancData.write_to_logfile('Rigid Registration saved as identity: ' + str(affine_matrix_path))
+            self.write_to_logfile('Rigid Registration saved as identity: ' + str(affine_matrix_path))
     
 
     def InitAlignment(self):
@@ -772,7 +774,7 @@ class DefromableRegs(MancData):
         MancData.__init__(self, base_path, niftireg_path, '')
         self.PatientNo = PatientNo
         self.PatientUCLHRegsPath = self.base_path + '/UCLHMODELSPACE_REGS/' + str(self.PatientNo)
-        MancData.write_to_logfile('Deformable Registration Patient ' + str(self.PatientNo))
+        self.write_to_logfile('Deformable Registration Patient ' + str(self.PatientNo))
 
     def set__CBCTtimepoint(self, CBCT_timepoint):
 
@@ -781,7 +783,7 @@ class DefromableRegs(MancData):
     def test__DefReg(self, transformation_path):
 
         if not os.path.exists(self):
-            MancData.write_to_logfile('Failed Registration CBCT: ' + str(self.CBCT_timepoint))
+            self.write_to_logfile('Failed Registration CBCT: ' + str(self.CBCT_timepoint))
 
 
 
