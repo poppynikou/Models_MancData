@@ -18,13 +18,13 @@ class MancData():
         self.atlas_path = atlas_path
 
     def create_log_file(self):
-
+    
         self.path_to_log_file = self.base_path + '/log.txt'
         if not os.path.exists(self.path_to_log_file):
-            open(self.path_to_log_file,"w+")
+            open(self.path_to_log_file,"a")
     
     def write_to_logfile(self, text):
-        file = open(self.path_to_log_file,"w+")
+        file = open(self.path_to_log_file,"a")
         file.write(str(text) + '\n')
 
     def read_anonymisation_key(self, anonymisation_key_path):
@@ -498,29 +498,42 @@ class GroupwiseRegs(MancData):
         self.set_resampledimgs()
 
     def rigidGroupReg(self):
-
+    
         for index in np.arange(0, len(self.CBCT_relative_timepoints)):
 
             float_img = self.float_imgs[index]
             affine_matrix = self.affine_matrixes[index]
             resampled_img = self.rigidReg_resampled_imgs[index]
-
+                
             rigidReg(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
-
-            os.remove(resampled_img)
-
-            self.test__rigidReg()
+        
+            if self.test__rigidReg(affine_matrix):
+                
+                self.write_to_logfile('Rigid Registration FAILED: ' + str(affine_matrix))
+                self.write_to_logfile('Trying again ..')
+                
+                rigidReg(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
+                
+                if self.test__rigidReg(affine_matrix):
+                    
+                    self.write_to_logfile('Rigid Registration FAILED: ' + str(affine_matrix))
+                    self.write_to_logfile('Trying single thread ..')
+                    
+                    rigidReg_SINGLETREAD(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
+                    
+                    if self.test__rigidReg(affine_matrix):
+        
+                        self.write_to_logfile('Rigid Registration FAILED: ' + str(affine_matrix))
+                    
+                else:
+                    self.write_to_logfile('Rigid Registration PASSED')
 
 
 
     def test__rigidReg(self, affine_matrix_path):
 
-        if not os.file.exists(affine_matrix_path):
-
-            matrix = np.identity(4)
-            np.savetxt(affine_matrix_path, matrix)
-
-            self.write_to_logfile('Rigid Registration saved as identity: ' + str(affine_matrix_path))
+        if not os.path.exists(affine_matrix_path):
+            return True
 
 
     def avgAffine(self):
@@ -606,9 +619,30 @@ class GroupwiseRegs(MancData):
         transformation = self.CBCT_pCT_path + '/affine.txt'
         resampled_img = self.CBCT_pCT_path + '/CBCT_0.nii.gz'
 
-        rigidReg(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly= True)
+        rigidReg(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly = True)
+        
+        if self.test__rigidReg(transformation):
+            
+            self.write_to_logfile('Rigid Registration FAILED: ' + str(transformation))
+            self.write_to_logfile('Trying again ..')
+            
+            rigidReg(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly = True)
+            
+            if self.test__rigidReg(transformation):
+                
+                self.write_to_logfile('Rigid Registration FAILED: ' + str(transformation))
+                self.write_to_logfile('Trying single thread ..')
+                
+                rigidReg_SINGLETREAD(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly = True)
+                
+                if self.test__rigidReg(transformation):
+    
+                    self.write_to_logfile('Rigid Registration FAILED: ' + str(transformation))
+                
+            else:
+                self.write_to_logfile('Rigid Registration PASSED')
+            
 
-        self.test__rigidReg(transformation)
 
     def UpdateSform(self):
 

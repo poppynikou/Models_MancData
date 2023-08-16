@@ -16,9 +16,6 @@ for patient in patients:
     
         if patient[0:3] == 'HN_':
             
-            print(patient)
-            
-            try:
 
                 # if a certain path exists and is not empty 
                 # check before you do it again 
@@ -43,9 +40,7 @@ for patient in patients:
                 GroupwiseReg.rigidpCTReg()
                 GroupwiseReg.UpdateSform()
                 
-            except:
-                pass
-                
+        
                 '''
                 AtlasAlignment = AtlasRegs(patient, base_path, niftireg_path, atlas_path)
 
