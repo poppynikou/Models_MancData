@@ -7,9 +7,10 @@ from src.utils.functions import *
 
 class MancData():
     
-    def __init__(self, base_path, niftireg_path, atlas_path):
+    def __init__(self, base_path, niftireg_path, atlas_path, onedrive_path):
 
         self.base_path = base_path
+        self.onedrive_path = onedrive_path
         self.reg_transform = niftireg_path +'/reg_transform.exe'
         self.reg_average = niftireg_path +'/reg_average.exe'
         self.reg_aladin = niftireg_path +'/reg_aladin.exe'
@@ -18,8 +19,7 @@ class MancData():
         self.atlas_path = atlas_path
 
     def create_log_file(self):
-    
-        self.path_to_log_file = self.base_path + '/log.txt'
+        self.path_to_log_file = self.onedrive_path + 'log.txt'
         if not os.path.exists(self.path_to_log_file):
             open(self.path_to_log_file,"a")
     
@@ -46,8 +46,7 @@ class PatientData(MancData):
 
     def __init__(self, PatientID, base_path, niftireg_path):
         self.PatientID = PatientID
-        MancData.__init__(self, base_path, niftireg_path, '')
-
+        MancData.__init__(self, base_path, niftireg_path, '', '')
 
     def get_PatientNo(self, anonymisation_key_path):
         
@@ -127,7 +126,7 @@ class Image(MancData):
     def __init__(self, PatientNo, base_path, niftireg_path):
 
         self.PatientNo = PatientNo
-        MancData.__init__(self, base_path, niftireg_path, '')
+        MancData.__init__(self, base_path, niftireg_path, '', '')
         return
     
     def read_meta_info(self, csv_file):
@@ -394,10 +393,10 @@ class Image(MancData):
 
 class GroupwiseRegs(MancData):
 
-    def __init__(self, PatientNo, no_itterations, base_path, niftireg_path):
+    def __init__(self, PatientNo, no_itterations, base_path, niftireg_path, onedrivepath):
         self.PatientNo = PatientNo 
         self.no_itterations = no_itterations 
-        MancData.__init__(self, base_path, niftireg_path, '')
+        MancData.__init__(self, base_path, niftireg_path, '', onedrivepath)
         self.create_log_file()
         self.write_to_logfile('Groupwise Registration Patient ' + str(self.PatientNo))
         return
@@ -506,34 +505,6 @@ class GroupwiseRegs(MancData):
             resampled_img = self.rigidReg_resampled_imgs[index]
                 
             rigidReg(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
-        
-            if self.test__rigidReg(affine_matrix):
-                
-                self.write_to_logfile('Rigid Registration FAILED: ' + str(affine_matrix))
-                self.write_to_logfile('Trying again ..')
-                
-                rigidReg(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
-                
-                if self.test__rigidReg(affine_matrix):
-                    
-                    self.write_to_logfile('Rigid Registration FAILED: ' + str(affine_matrix))
-                    self.write_to_logfile('Trying single thread ..')
-                    
-                    rigidReg_SINGLETREAD(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
-                    
-                    if self.test__rigidReg(affine_matrix):
-        
-                        self.write_to_logfile('Rigid Registration FAILED: ' + str(affine_matrix))
-                    
-                else:
-                    self.write_to_logfile('Rigid Registration PASSED')
-
-
-
-    def test__rigidReg(self, affine_matrix_path):
-
-        if not os.path.exists(affine_matrix_path):
-            return True
 
 
     def avgAffine(self):
@@ -620,27 +591,6 @@ class GroupwiseRegs(MancData):
         resampled_img = self.CBCT_pCT_path + '/CBCT_0.nii.gz'
 
         rigidReg(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly = True)
-        
-        if self.test__rigidReg(transformation):
-            
-            self.write_to_logfile('Rigid Registration FAILED: ' + str(transformation))
-            self.write_to_logfile('Trying again ..')
-            
-            rigidReg(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly = True)
-            
-            if self.test__rigidReg(transformation):
-                
-                self.write_to_logfile('Rigid Registration FAILED: ' + str(transformation))
-                self.write_to_logfile('Trying single thread ..')
-                
-                rigidReg_SINGLETREAD(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly = True)
-                
-                if self.test__rigidReg(transformation):
-    
-                    self.write_to_logfile('Rigid Registration FAILED: ' + str(transformation))
-                
-            else:
-                self.write_to_logfile('Rigid Registration PASSED')
             
 
 
@@ -656,8 +606,8 @@ class GroupwiseRegs(MancData):
     
 class AtlasRegs(MancData):
 
-    def __init__(self, PatientNo, base_path, niftireg_path, atlas_path):
-        MancData.__init__(self, base_path, niftireg_path, atlas_path)
+    def __init__(self, PatientNo, base_path, niftireg_path, atlas_path, onedrivepath):
+        MancData.__init__(self, base_path, niftireg_path, atlas_path, onedrivepath)
         self.PatientNo = PatientNo
         self.PatientPath = self.base_path + '/' + str(self.PatientNo) +'/'
         self.PatientCTPath = self.PatientPath + 'pCT/'
@@ -676,14 +626,6 @@ class AtlasRegs(MancData):
         self.PatientUCLHRegsPath = UCLHRegsPath + str(self.PatientNo) +'/'
         if not os.path.exists(self.PatientUCLHRegsPath):
             os.mkdir(self.PatientUCLHRegsPath)
-
-    def test__RigidReg(self, affine_matrix_path):
-        if not os.path.exists(affine_matrix_path):
-
-            matrix = np.identity(4)
-            np.savetxt(affine_matrix_path, matrix)
-
-            self.write_to_logfile('Rigid Registration saved as identity: ' + str(affine_matrix_path))
     
 
     def InitAlignment(self):
@@ -694,8 +636,6 @@ class AtlasRegs(MancData):
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
         os.remove(resampled_img)
-
-        self.test__RigidReg(affine_matrix)
 
         img_to_be_updated = self.PatientCTPath + 'atlas_MASKED_pCT.nii.gz' 
         updated_img = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
@@ -710,8 +650,6 @@ class AtlasRegs(MancData):
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
         os.remove(resampled_img)
-
-        self.test__RigidReg(affine_matrix)
         
         img_to_be_updated = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
         updated_img = self.ModelSpacePath + 'Rigid_pCT.nii.gz'
@@ -728,7 +666,6 @@ class AtlasRegs(MancData):
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= False)
         os.remove(resampled_img)
 
-        self.test__RigidReg(affine_matrix)
         
         img_to_be_updated = self.ModelSpacePath + 'Rigid_pCT.nii.gz'
         updated_img = self.ModelSpacePath + 'Affine_pCT.nii.gz'
@@ -804,8 +741,8 @@ class AtlasRegs(MancData):
 
 class DefromableRegs(MancData):
 
-    def __init__(self, PatientNo, base_path, niftireg_path):
-        MancData.__init__(self, base_path, niftireg_path, '')
+    def __init__(self, PatientNo, base_path, niftireg_path, onedrivepath):
+        MancData.__init__(self, base_path, niftireg_path, '', onedrivepath)
         self.PatientNo = PatientNo
         self.PatientUCLHRegsPath = self.base_path + '/UCLHMODELSPACE_REGS/' + str(self.PatientNo)
         self.write_to_logfile('Deformable Registration Patient ' + str(self.PatientNo))
@@ -813,11 +750,6 @@ class DefromableRegs(MancData):
     def set__CBCTtimepoint(self, CBCT_timepoint):
 
         self.CBCT_timepoint = CBCT_timepoint
-
-    def test__DefReg(self, transformation_path):
-
-        if not os.path.exists(self):
-            self.write_to_logfile('Failed Registration CBCT: ' + str(self.CBCT_timepoint))
 
 
 
@@ -830,6 +762,5 @@ class DefromableRegs(MancData):
 
         deformableReg(self.reg_f3d, ref_img, float_img, resampled_img, cpp)
 
-        self.test__DefReg()
 
     
