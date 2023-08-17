@@ -26,6 +26,10 @@ class MancData():
     def write_to_logfile(self, text):
         file = open(self.path_to_log_file,"a")
         file.write(str(text) + '\n')
+        
+    def test__filenotexsits(self, file_path):
+        if not os.path.exists(file_path):
+            return True 
 
     def read_anonymisation_key(self, anonymisation_key_path):
 
@@ -398,7 +402,8 @@ class GroupwiseRegs(MancData):
         self.no_itterations = no_itterations 
         MancData.__init__(self, base_path, niftireg_path, '', onedrivepath)
         self.create_log_file()
-        self.write_to_logfile('Groupwise Registration Patient ' + str(self.PatientNo))
+        self.write_to_logfile('---------------------- ' + str(self.PatientNo) + '------------------------------')
+        self.write_to_logfile('Groupwise Registration')
         return
         
     def get_CBCT_relative_timepoints(self, anonymisation_key_path):
@@ -495,6 +500,8 @@ class GroupwiseRegs(MancData):
         self.set_rigidReg_resampledimgs()
         self.set_composed_affinematrixes()
         self.set_resampledimgs()
+        
+
 
     def rigidGroupReg(self):
     
@@ -505,8 +512,11 @@ class GroupwiseRegs(MancData):
             resampled_img = self.rigidReg_resampled_imgs[index]
                 
             rigidReg(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
-
-
+            
+            if self.test__filenotexsits(affine_matrix):
+                self.write_to_logfile('FAILED: ' + str(affine_matrix))
+            
+    
     def avgAffine(self):
 
         self.average_affine = self.results_folder + '/affine_' + str(self.itteration + 1) + '/average_affine.txt'
@@ -591,6 +601,9 @@ class GroupwiseRegs(MancData):
         resampled_img = self.CBCT_pCT_path + '/CBCT_0.nii.gz'
 
         rigidReg(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly = True)
+        
+        if self.test__filenotexsits(transformation):
+                self.write_to_logfile('FAILED: ' + str(transformation))
             
 
 
@@ -611,7 +624,7 @@ class AtlasRegs(MancData):
         self.PatientNo = PatientNo
         self.PatientPath = self.base_path + '/' + str(self.PatientNo) +'/'
         self.PatientCTPath = self.PatientPath + 'pCT/'
-        self.write_to_logfile('Atlas Registration Patient ' + str(self.PatientNo))
+        self.write_to_logfile('Atlas Registration')
         
 
     def refactor(self):
@@ -636,6 +649,9 @@ class AtlasRegs(MancData):
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
         os.remove(resampled_img)
+        
+        if self.test__filenotexsits(affine_matrix):
+                self.write_to_logfile('FAILED: ' + str(affine_matrix))
 
         img_to_be_updated = self.PatientCTPath + 'atlas_MASKED_pCT.nii.gz' 
         updated_img = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
@@ -651,6 +667,9 @@ class AtlasRegs(MancData):
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
         os.remove(resampled_img)
         
+        if self.test__filenotexsits(affine_matrix):
+                self.write_to_logfile('FAILED: ' + str(affine_matrix))
+        
         img_to_be_updated = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
         updated_img = self.ModelSpacePath + 'Rigid_pCT.nii.gz'
         UpdSform(self.reg_transform, img_to_be_updated, affine_matrix, updated_img)
@@ -665,6 +684,9 @@ class AtlasRegs(MancData):
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= False)
         os.remove(resampled_img)
+        
+        if self.test__filenotexsits(affine_matrix):
+                self.write_to_logfile('FAILED: ' + str(affine_matrix))
 
         
         img_to_be_updated = self.ModelSpacePath + 'Rigid_pCT.nii.gz'
@@ -679,8 +701,12 @@ class AtlasRegs(MancData):
         resampled_img = self.ModelSpacePath + 'DEF_pCT.nii.gz'
         transformation = self.ModelSpacePath + 'cpp_pCT.nii.gz'
         deformableReg(self.reg_f3d, self.atlas_path, float_img, resampled_img, transformation)
-        return
     
+        if self.test__filenotexsits(transformation):
+             self.write_to_logfile('FAILED: ' + str(transformation))
+             
+        return
+        
     def Calc_Tatlas(self):
         
         # calculate deformation fields of affine matrixes
@@ -713,6 +739,7 @@ class AtlasRegs(MancData):
         output_transformation3 = self.PatientPath + 'T_model.nii.gz'
         ComposeTransformations(self.reg_transform, self.atlas_path, transformation1, transformation2, output_transformation3)
         os.remove(transformation2)
+        
 
         return
 
@@ -737,15 +764,13 @@ class AtlasRegs(MancData):
             resampleImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
 
         
-
-
 class DefromableRegs(MancData):
 
     def __init__(self, PatientNo, base_path, niftireg_path, onedrivepath):
         MancData.__init__(self, base_path, niftireg_path, '', onedrivepath)
         self.PatientNo = PatientNo
         self.PatientUCLHRegsPath = self.base_path + '/UCLHMODELSPACE_REGS/' + str(self.PatientNo)
-        self.write_to_logfile('Deformable Registration Patient ' + str(self.PatientNo))
+        self.write_to_logfile('Deformable Registrations')
 
     def set__CBCTtimepoint(self, CBCT_timepoint):
 
@@ -761,6 +786,9 @@ class DefromableRegs(MancData):
         cpp = self.PatientUCLHRegsPath + '/CBCT_' + str(self.CBCT_timepoint) +'/cpp_CBCT.nii.gz'
 
         deformableReg(self.reg_f3d, ref_img, float_img, resampled_img, cpp)
+        
+        if self.test__filenotexsits(cpp):
+                self.write_to_logfile('FAILED: ' + str(cpp))
 
 
     

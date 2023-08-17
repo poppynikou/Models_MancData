@@ -63,7 +63,7 @@ for batch in batches:
                             LongitudinalRegs.set__CBCTtimepoint(CBCT_timepoint)
                             LongitudinalRegs.DefReg()
                             
-                    excepX:
+                    except:
                         pass
                     
                     
