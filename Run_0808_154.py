@@ -5,15 +5,15 @@ import pandas as pd
 from src.utils.functions import * 
 
 batches = [2,3]
-niftireg_path = 'T:/Poppy/niftireg_executables/'
+niftireg_path = 'X:/Poppy/niftireg_executables/'
 no_itterations = 2
 # path to the file which contains all patient info
-patients_csv_path = 'T:/Poppy/Anonymisation_Key.csv'
-atlas_path = 'T:/Poppy/PatData/MASKED_average_pCT.nii.gz'
+patients_csv_path = 'X:/Poppy/Anonymisation_Key.csv'
+atlas_path = 'X:/Poppy/PatData/MASKED_average_pCT.nii.gz'
 onedrive_path = 'C:/Users/Poppy/OneDrive - University College London/Manc_Data_Log/'
 
 for batch in batches:
-    base_path = 'T:/Poppy/PatData/batch' + str(batch) + '/'
+    base_path = 'X:/Poppy/PatData/batch' + str(batch) + '/'
     patients = os.listdir(base_path)
     for patient in patients: 
         
@@ -63,7 +63,7 @@ for batch in batches:
                             LongitudinalRegs.set__CBCTtimepoint(CBCT_timepoint)
                             LongitudinalRegs.DefReg()
                             
-                    except:
+                    excepX:
                         pass
                     
                     
