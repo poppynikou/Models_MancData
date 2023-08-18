@@ -11,6 +11,7 @@ class MancData():
 
         self.base_path = base_path
         self.onedrive_path = onedrive_path
+        self.path_to_log_file = self.onedrive_path + 'log.txt'
         self.reg_transform = niftireg_path +'/reg_transform.exe'
         self.reg_average = niftireg_path +'/reg_average.exe'
         self.reg_aladin = niftireg_path +'/reg_aladin.exe'
@@ -19,7 +20,6 @@ class MancData():
         self.atlas_path = atlas_path
 
     def create_log_file(self):
-        self.path_to_log_file = self.onedrive_path + 'log.txt'
         if not os.path.exists(self.path_to_log_file):
             open(self.path_to_log_file,"a")
     
