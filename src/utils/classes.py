@@ -60,9 +60,11 @@ class PatientData(MancData):
     
     def get_CBCT_relative_timepoints(self):
 
+        # returns unique set of CBCT relative time points 
         CBCT_relative_timepoints = self.anonymisation_key.loc[self.anonymisation_key['Patient_ID'] == int(self.PatientID[0:9])].iloc[:,4:35].values.tolist()
         self.CBCT_relative_timepoints = CBCT_relative_timepoints[0]
         self.CBCT_relative_timepoints = [int(x) for x in self.CBCT_relative_timepoints if ~np.isnan(x)]
+        self.CBCT_relative_timepoints = np.array(list(set(self.CBCT_relative_timepoints)), dtype = np.int8)
         return self.CBCT_relative_timepoints
 
     def get_patient_folder(self):
@@ -137,7 +139,7 @@ class Image(MancData):
 
         meta_info =  pd.read_csv(csv_file, header=0)
         self.patient_masking_info = meta_info.loc[(meta_info['PatientNo']==self.PatientNo)]
-    
+
     
     def zip_nifti(self, img_path):
 
@@ -435,9 +437,8 @@ class GroupwiseRegs(MancData):
             os.mkdir(self.CBCT_pCT_path)
 
 
-        
         for CBCT_timepoint in self.CBCT_relative_timepoints:
-            # cropped imgs 
+                # cropped imgs 
             source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/MASKED_CBCT_' +str(CBCT_timepoint) + '.nii.gz'
             destination = self.results_folder + 'affine_0/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
             shutil.copy(source, destination)
@@ -448,7 +449,7 @@ class GroupwiseRegs(MancData):
             destination = self.postprocessing_path + '/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
             shutil.copy(source, destination)
         
-        
+
     
     def set_itteration(self, itteration):
 
@@ -700,7 +701,8 @@ class AtlasRegs(MancData):
         float_img = self.ModelSpacePath + 'Affine_pCT.nii.gz'
         resampled_img = self.ModelSpacePath + 'DEF_pCT.nii.gz'
         transformation = self.ModelSpacePath + 'cpp_pCT.nii.gz'
-        deformableReg(self.reg_f3d, self.atlas_path, float_img, resampled_img, transformation)
+        if not os.path.exists(transformation):
+            deformableReg(self.reg_f3d, self.atlas_path, float_img, resampled_img, transformation)
     
         if self.test__filenotexsits(transformation):
              self.write_to_logfile('FAILED: ' + str(transformation))
