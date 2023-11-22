@@ -4,20 +4,33 @@ import pandas as pd
 import nibabel as nib 
 import numpy as np 
 from functions import *
-import scipy.linalg
+
 
 class MancData():
     
-    def __init__(self, base_path, niftireg_path, atlas_path):
+    def __init__(self, base_path, niftireg_path, atlas_path, onedrive_path):
 
         self.base_path = base_path
+        self.onedrive_path = onedrive_path
+        self.path_to_log_file = self.onedrive_path + 'log.txt'
         self.reg_transform = niftireg_path +'/reg_transform.exe'
         self.reg_average = niftireg_path +'/reg_average.exe'
         self.reg_aladin = niftireg_path +'/reg_aladin.exe'
         self.reg_resample = niftireg_path +'/reg_resample.exe'
         self.reg_f3d = niftireg_path +'/reg_f3d.exe'
         self.atlas_path = atlas_path
+
+    def create_log_file(self):
+        if not os.path.exists(self.path_to_log_file):
+            open(self.path_to_log_file,"a")
+    
+    def write_to_logfile(self, text):
+        file = open(self.path_to_log_file,"a")
+        file.write(str(text) + '\n')
         
+    def test__filenotexsits(self, file_path):
+        if not os.path.exists(file_path):
+            return True 
 
     def read_anonymisation_key(self, anonymisation_key_path):
 
@@ -38,7 +51,7 @@ class PatientData(MancData):
 
     def __init__(self, PatientID, base_path, niftireg_path):
         self.PatientID = PatientID
-        MancData.__init__(self, base_path, niftireg_path, '')
+        MancData.__init__(self, base_path, niftireg_path, '', '')
 
     def get_PatientNo(self, anonymisation_key_path):
         
@@ -47,11 +60,12 @@ class PatientData(MancData):
         return self.PatientNo
     
     def get_CBCT_relative_timepoints(self):
-        
 
+        # returns unique set of CBCT relative time points 
         CBCT_relative_timepoints = self.anonymisation_key.loc[self.anonymisation_key['Patient_ID'] == int(self.PatientID[0:9])].iloc[:,4:35].values.tolist()
         self.CBCT_relative_timepoints = CBCT_relative_timepoints[0]
         self.CBCT_relative_timepoints = [int(x) for x in self.CBCT_relative_timepoints if ~np.isnan(x)]
+        self.CBCT_relative_timepoints = np.array(list(set(self.CBCT_relative_timepoints)), dtype = np.int8)
         return self.CBCT_relative_timepoints
 
     def get_patient_folder(self):
@@ -119,14 +133,14 @@ class Image(MancData):
     def __init__(self, PatientNo, base_path, niftireg_path):
 
         self.PatientNo = PatientNo
-        MancData.__init__(self, base_path, niftireg_path, '')
+        MancData.__init__(self, base_path, niftireg_path, '', '')
         return
     
     def read_meta_info(self, csv_file):
 
         meta_info =  pd.read_csv(csv_file, header=0)
         self.patient_masking_info = meta_info.loc[(meta_info['PatientNo']==self.PatientNo)]
-    
+
     
     def zip_nifti(self, img_path):
 
@@ -287,17 +301,17 @@ class Image(MancData):
         z_slice = int(self.patient_masking_info['CT_M_Z'].iloc[0])
         
         return x_slices, y_slices, z_slice
+       
 
     def mask_CT(self, img_path, new_atlas_img_path, new_masked_img_path):
         
         x_slices, y_slices, z_slice = self.return_masking_info()
 
-        img_data, img_affine, img_header = self.get_img_objects(pCT_path + '/pCT.nii.gz')
+        img_data, img_affine, img_header = self.get_img_objects(img_path)
 
         img_data_copy = np.array(img_data.copy())
         (x,y,z) = np.shape(img_data_copy)
 
-        # mask out the couch 
         img_data_copy[:,y_slices[0]:y,:] = np.NaN
         img_data_copy[:,0:y_slices[1],:] = np.NaN
 
@@ -324,7 +338,6 @@ class Image(MancData):
 
         img_data, img_affine, img_header = self.get_img_objects(img_path)
         img_data_copy = img_data.copy()
-
         # index at top corner 
         masking_HU = img_data_copy[0,0,0]
         img_data_copy[img_data_copy == masking_HU] = np.NaN
@@ -387,10 +400,13 @@ class Image(MancData):
 
 class GroupwiseRegs(MancData):
 
-    def __init__(self, PatientNo, no_itterations, base_path, niftireg_path):
+    def __init__(self, PatientNo, no_itterations, base_path, niftireg_path, onedrivepath):
         self.PatientNo = PatientNo 
         self.no_itterations = no_itterations 
-        MancData.__init__(self, base_path, niftireg_path, '')
+        MancData.__init__(self, base_path, niftireg_path, '', onedrivepath)
+        self.create_log_file()
+        self.write_to_logfile('---------------------- ' + str(self.PatientNo) + '------------------------------')
+        self.write_to_logfile('Groupwise Registration')
         return
         
     def get_CBCT_relative_timepoints(self, anonymisation_key_path):
@@ -421,8 +437,9 @@ class GroupwiseRegs(MancData):
         if not os.path.exists(self.CBCT_pCT_path):
             os.mkdir(self.CBCT_pCT_path)
 
+
         for CBCT_timepoint in self.CBCT_relative_timepoints:
-            # cropped imgs 
+                # cropped imgs 
             source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/MASKED_CBCT_' +str(CBCT_timepoint) + '.nii.gz'
             destination = self.results_folder + 'affine_0/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
             shutil.copy(source, destination)
@@ -432,6 +449,8 @@ class GroupwiseRegs(MancData):
             source = str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_' + str(CBCT_timepoint) + '/MASKED_CBCT_' +str(CBCT_timepoint) + '.nii.gz'
             destination = self.postprocessing_path + '/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
             shutil.copy(source, destination)
+        
+
     
     def set_itteration(self, itteration):
 
@@ -472,7 +491,7 @@ class GroupwiseRegs(MancData):
 
         self.resampled_imgs = []
         for CBCT_timepoint in self.CBCT_relative_timepoints:
-            self.resampled_imgs.append(self.results_folder + '/affine_' + str(self.itteration +1) + '/CBCT_'+str(CBCT_timepoint)+'.nii.gz')
+            self.resampled_imgs.append(self.results_folder + '/affine_' + str(self.itteration+1) + '/CBCT_'+str(CBCT_timepoint)+'.nii.gz')
 
     def set__itteration(self, itteration):
 
@@ -483,19 +502,23 @@ class GroupwiseRegs(MancData):
         self.set_rigidReg_resampledimgs()
         self.set_composed_affinematrixes()
         self.set_resampledimgs()
+        
+
 
     def rigidGroupReg(self):
-
+    
         for index in np.arange(0, len(self.CBCT_relative_timepoints)):
 
             float_img = self.float_imgs[index]
             affine_matrix = self.affine_matrixes[index]
             resampled_img = self.rigidReg_resampled_imgs[index]
-
+                
             rigidReg(self.reg_aladin, self.ref_img, float_img, affine_matrix, resampled_img, RigOnly = True)
-
-            os.remove(resampled_img)
-
+            
+            if self.test__filenotexsits(affine_matrix):
+                self.write_to_logfile('FAILED: ' + str(affine_matrix))
+            
+    
     def avgAffine(self):
 
         self.average_affine = self.results_folder + '/affine_' + str(self.itteration + 1) + '/average_affine.txt'
@@ -572,15 +595,18 @@ class GroupwiseRegs(MancData):
 
                 UpdSform(self.reg_transform, img, affine_matrix_path, img)
 
-
     def rigidpCTReg(self):
 
         ref_img = self.results_folder = str(self.base_path) + '/' + str(self.PatientNo) + '/pCT/MASKED_pCT.nii.gz'
-        float_img = self.resampled_imgs[0]
+        float_img = self.postprocessing_path + '/CBCT_0.nii.gz'
         transformation = self.CBCT_pCT_path + '/affine.txt'
         resampled_img = self.CBCT_pCT_path + '/CBCT_0.nii.gz'
 
-        rigidReg(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly= True)
+        rigidReg(self.reg_aladin, ref_img, float_img, transformation, resampled_img, RigOnly = True)
+        
+        if self.test__filenotexsits(transformation):
+                self.write_to_logfile('FAILED: ' + str(transformation))
+            
 
 
     def UpdateSform(self):
@@ -592,17 +618,15 @@ class GroupwiseRegs(MancData):
             updated_img = self.CBCT_pCT_path + '/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
 
             UpdSform(self.reg_transform, img_to_be_updated, affine_matrix_path, updated_img)
-
-
-
     
 class AtlasRegs(MancData):
 
-    def __init__(self, PatientNo, base_path, niftireg_path, atlas_path):
-        MancData.__init__(self, base_path, niftireg_path, atlas_path)
+    def __init__(self, PatientNo, base_path, niftireg_path, atlas_path, onedrivepath):
+        MancData.__init__(self, base_path, niftireg_path, atlas_path, onedrivepath)
         self.PatientNo = PatientNo
         self.PatientPath = self.base_path + '/' + str(self.PatientNo) +'/'
         self.PatientCTPath = self.PatientPath + 'pCT/'
+        self.write_to_logfile('Atlas Registration')
         
 
     def refactor(self):
@@ -617,6 +641,7 @@ class AtlasRegs(MancData):
         self.PatientUCLHRegsPath = UCLHRegsPath + str(self.PatientNo) +'/'
         if not os.path.exists(self.PatientUCLHRegsPath):
             os.mkdir(self.PatientUCLHRegsPath)
+    
 
     def InitAlignment(self):
 
@@ -626,12 +651,15 @@ class AtlasRegs(MancData):
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
         os.remove(resampled_img)
+        
+        if self.test__filenotexsits(affine_matrix):
+                self.write_to_logfile('FAILED: ' + str(affine_matrix))
 
         img_to_be_updated = self.PatientCTPath + 'atlas_MASKED_pCT.nii.gz' 
         updated_img = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
         UpdSform(self.reg_transform, img_to_be_updated, affine_matrix, updated_img)
         return
-    
+
     def RigidReg(self):
 
         float_img = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
@@ -640,6 +668,9 @@ class AtlasRegs(MancData):
 
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= True)
         os.remove(resampled_img)
+        
+        if self.test__filenotexsits(affine_matrix):
+                self.write_to_logfile('FAILED: ' + str(affine_matrix))
         
         img_to_be_updated = self.ModelSpacePath + 'InitAlignment_pCT.nii.gz'
         updated_img = self.ModelSpacePath + 'Rigid_pCT.nii.gz'
@@ -656,6 +687,10 @@ class AtlasRegs(MancData):
         rigidReg(self.reg_aladin, self.atlas_path, float_img, affine_matrix, resampled_img, RigOnly= False)
         os.remove(resampled_img)
         
+        if self.test__filenotexsits(affine_matrix):
+                self.write_to_logfile('FAILED: ' + str(affine_matrix))
+
+        
         img_to_be_updated = self.ModelSpacePath + 'Rigid_pCT.nii.gz'
         updated_img = self.ModelSpacePath + 'Affine_pCT.nii.gz'
         UpdSform(self.reg_transform, img_to_be_updated, affine_matrix, updated_img)
@@ -667,9 +702,14 @@ class AtlasRegs(MancData):
         float_img = self.ModelSpacePath + 'Affine_pCT.nii.gz'
         resampled_img = self.ModelSpacePath + 'DEF_pCT.nii.gz'
         transformation = self.ModelSpacePath + 'cpp_pCT.nii.gz'
-        deformableReg(self.reg_f3d, self.atlas_path, float_img, resampled_img, transformation)
-        return
+        if not os.path.exists(transformation):
+            deformableReg(self.reg_f3d, self.atlas_path, float_img, resampled_img, transformation)
     
+        if self.test__filenotexsits(transformation):
+             self.write_to_logfile('FAILED: ' + str(transformation))
+             
+        return
+        
     def Calc_Tatlas(self):
         
         # calculate deformation fields of affine matrixes
@@ -702,6 +742,7 @@ class AtlasRegs(MancData):
         output_transformation3 = self.PatientPath + 'T_model.nii.gz'
         ComposeTransformations(self.reg_transform, self.atlas_path, transformation1, transformation2, output_transformation3)
         os.remove(transformation2)
+        
 
         return
 
@@ -714,20 +755,30 @@ class AtlasRegs(MancData):
         float_img = self.PatientCTPath + 'MASKED_pCT.nii.gz'
         resampled_img = self.PatientUCLHRegsPath + '/MASKED_pCT.nii.gz'
         resampleImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
+        
+        for CBCT_timepoint in CBCT_timepoints:
+
+            CBCT_RegsPath = self.PatientUCLHRegsPath + '/CBCT_' + str(CBCT_timepoint)
+            if not os.path.exists(CBCT_RegsPath):
+                os.mkdir(CBCT_RegsPath)
+ 
+            float_img =  str(self.base_path) + '/' + str(self.PatientNo) + '/CBCT_pCT/CBCT_' + str(CBCT_timepoint) + '.nii.gz'
+            resampled_img = CBCT_RegsPath + '/MASKED_CBCT.nii.gz'
+            resampleImg(self.reg_resample, self.atlas_path, float_img, T_model, resampled_img)
 
         
-
-
 class DefromableRegs(MancData):
 
-    def __init__(self, PatientNo, base_path, niftireg_path):
-        MancData.__init__(self, base_path, niftireg_path, '')
+    def __init__(self, PatientNo, base_path, niftireg_path, onedrivepath):
+        MancData.__init__(self, base_path, niftireg_path, '', onedrivepath)
         self.PatientNo = PatientNo
         self.PatientUCLHRegsPath = self.base_path + '/UCLHMODELSPACE_REGS/' + str(self.PatientNo)
+        self.write_to_logfile('Deformable Registrations')
 
     def set__CBCTtimepoint(self, CBCT_timepoint):
 
         self.CBCT_timepoint = CBCT_timepoint
+
 
 
     def DefReg(self):
@@ -738,4 +789,3 @@ class DefromableRegs(MancData):
         cpp = self.PatientUCLHRegsPath + '/CBCT_' + str(self.CBCT_timepoint) +'/cpp_CBCT.nii.gz'
 
         deformableReg(self.reg_f3d, ref_img, float_img, resampled_img, cpp)
-

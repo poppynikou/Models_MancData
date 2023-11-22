@@ -2,12 +2,12 @@ import os
 from utils.classes import *
 
 
-base_path = 'T:/Poppy/PatData/batch1/'
-niftireg_path = 'T:/Poppy/niftireg_executables/'
+base_path = 'E:/Data/Poppy/PatData/batch2/'
+niftireg_path = 'E:/Data/Poppy/niftireg_executables/'
 atlas_path = ''
 
 # path to the file which contains all patient info
-patients_csv_path = 'T:/Poppy/Anonymisation_Key.csv'
+patients_csv_path = 'E:/Data/Poppy/Anonymisation_Key.csv'
 
 
 patients = os.listdir(base_path)
@@ -20,15 +20,14 @@ masking_path = 'C:/Users/Poppy/Documents/Model_Development/src/meta_info.csv'
 
 for patient in patients:#  
 
-        # check if the preprocessing for that patient has already been done
-        
+        # check if the preprocessing for that patient has already been done   
         PatientID = patient
         
         PatientObj = PatientData(PatientID, base_path, niftireg_path)
         PatientNo = PatientObj.get_PatientNo(patients_csv_path)
         print(PatientNo)
-        _ = PatientObj.get_CBCT_relative_timepoints()
         
+        _ = PatientObj.get_CBCT_relative_timepoints()
         
         # refactor the data into organised folders 
         PatientObj.refactor_pCT()
@@ -51,7 +50,7 @@ for patient in patients:#
                     ImgObj.zip_nifti(file_path)
 
         flip_img_Bool = ImgObj.flip_img_Bool(flip_record)
-       
+        
         
         # preprocess the images 
         for path, subdirs, files in os.walk(patient_path):
@@ -67,6 +66,7 @@ for patient in patients:#
                     ImgObj.rename_parotid(name, flip = False)
                 
                 
+                
                 if name[0:3] == 'pCT':
                     ImgObj.convert_to_float(file_path)
                     ImgObj.rescale_HU(file_path)
@@ -77,12 +77,15 @@ for patient in patients:#
                     cropped_img_path = base_path + str(PatientNo) + '/pCT/cropped_pCT.nii.gz'
                     ImgObj.crop_Img(masked_img_path, cropped_img_path, ImgType = 'CT')
                 
+                
                 if name[0:4] == 'CBCT':
                     ImgObj.convert_to_float(file_path)
                     masked_img_path = base_path + str(PatientNo) + '/'+ str(name[:-7])+'/MASKED_'+str(name)
                     ImgObj.mask_CBCT(file_path, masked_img_path)
                     cropped_img_path = base_path + str(PatientNo) + '/'+ str(name[:-7])+'/cropped_'+str(name)
                     ImgObj.crop_Img(masked_img_path, cropped_img_path, ImgType = 'CBCT')
+                
+                
 
                 
                 
