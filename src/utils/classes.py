@@ -4,7 +4,7 @@ import pandas as pd
 import nibabel as nib 
 import numpy as np 
 from functions import *
-
+import scipy.linalg
 
 class MancData():
     
@@ -738,3 +738,4 @@ class DefromableRegs(MancData):
         cpp = self.PatientUCLHRegsPath + '/CBCT_' + str(self.CBCT_timepoint) +'/cpp_CBCT.nii.gz'
 
         deformableReg(self.reg_f3d, ref_img, float_img, resampled_img, cpp)
+

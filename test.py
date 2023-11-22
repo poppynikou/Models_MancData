@@ -1,4 +1,5 @@
-x = [True, False, True]
-y = [True, True, True]
+tuple = (67, 67, 35, 1, 3)
+
 import numpy as np 
-print(np.logical_or(x,y))
+
+print(np.squeeze(tuple))
