@@ -24,7 +24,7 @@ if not os.path.exists(results_path):
         os.mkdir(results_path)
         
 PSM_Model = PSM(base_path, patient, numcp, patients_csv_path, results_path)
-Training_time_points = PSM_Model.get_training_time_points()
+Training_time_points = PSM_Model.get_CBCT_time_points()
 
 # LOO model
 for index, time_point in enumerate(Training_time_points[1:-1]):
@@ -42,9 +42,9 @@ for index, time_point in enumerate(Training_time_points[1:-1]):
         PSM_Model.test_SM()
         PSM_Model.save_SM() 
         
-        PSM_Model.resample_GT_Model()
-        PSM_Model.resample_RTSTRUCTs()
-        PSM_Model.resample_GT_RTSTRUCTs()
+        #PSM_Model.resample_GT_Model()
+        PSM_Model.resample_RTSTRUCTs(time_point)
+        #PSM_Model.resample_GT_RTSTRUCTs(time_point)
 
                         
 

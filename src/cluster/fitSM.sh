@@ -1,8 +1,8 @@
 # Scheduler directives
 #$ -S /bin/bash
-#$ -l h_rt=03:00:00
-#$ -l tmem=3G
-#$ -l h_vmem=3G
+#$ -l h_rt=06:00:00
+#$ -l tmem=4G
+#$ -l h_vmem=4G
 #$ -j y
 #$ -cwd
 #$ -N PSM_noLOO

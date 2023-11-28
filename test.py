@@ -1,5 +1,8 @@
-tuple = (67, 67, 35, 1, 3)
-
 import numpy as np 
 
-print(np.squeeze(tuple))
+
+t = [0,1,2,3,6,7,8,9,10,13,14,15,16,17,20,21,22,23,24,27,28,29,30,31,34,35,36,37,38,41,41]
+
+t = list(np.sort(np.unique(t)))
+
+print(t)

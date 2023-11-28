@@ -18,6 +18,7 @@ patient = 'HN_' + str(sys.argv[3])
 # number of control points 
 numcp = int(sys.argv[4])
 
+
 results_path = "/home/pnikou/Documents/Manc_Data/noLOO/"
 if not os.path.exists(results_path):
         os.mkdir(results_path)
@@ -31,9 +32,9 @@ PSM_Model.fit_SM()
 PSM_Model.test_SM()
 PSM_Model.save_SM() 
 
-PSM_Model.resample_GT_Model()
+#PSM_Model.resample_GT_Model()
 PSM_Model.resample_RTSTRUCTs()
-PSM_Model.resample_GT_RTSTRUCTs()
+#PSM_Model.resample_GT_RTSTRUCTs()
 
                         
 
