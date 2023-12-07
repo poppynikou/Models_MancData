@@ -9,7 +9,6 @@ Add in the different options for the training time points
 'specific time points' 
 '''
 
-
 # base path to where the batches of patient images are stored
 base_path = sys.argv[1]
 # path to the file which contains all patient info
@@ -42,9 +41,9 @@ for index, time_point in enumerate(Training_time_points[1:-1]):
         PSM_Model.test_SM()
         PSM_Model.save_SM() 
         
-        #PSM_Model.resample_GT_Model()
+        PSM_Model.resample_GT_Model()
         PSM_Model.resample_RTSTRUCTs(time_point)
-        #PSM_Model.resample_GT_RTSTRUCTs(time_point)
+        PSM_Model.resample_GT_RTSTRUCTs(time_point)
 
                         
 

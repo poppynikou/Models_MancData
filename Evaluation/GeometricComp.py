@@ -1,4 +1,3 @@
-import nibabel as nib
 import numpy as np 
 from utils import *
 import sys
@@ -18,7 +17,7 @@ elif Model == 1:
     results_path = base_path + '/noLOO/PSM_CPS_' + str(Numcps) + '/HN_' + str(Patient) 
 
 text_file = results_path + '/GeometricResults.txt'
-if os.file.exists(text_file):
+if os.path.exists(text_file):
     os.remove(text_file)
 
 file = open(text_file, 'a')

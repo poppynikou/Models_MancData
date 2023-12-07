@@ -24,7 +24,7 @@ for patient in patients:
     for numcp in numcps:
 
         PSM_Model = PSM(base_path, patient, numcp, patients_csv_path, results_path)
-        Training_time_points = PSM_Model.get_training_time_points()
+        Training_time_points = PSM_Model.get_CBCT_time_points()
 
         for model in Models:
             

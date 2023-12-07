@@ -42,8 +42,7 @@ class PSM():
             self.training_time_points = self.get_CBCT_relative_timepoints(self.anonymisation_key_path)
         else:
             self.training_time_points = training_time_points
-        print('training_time_points')
-        print(self.training_time_points)
+
 
     def set_testing_time_points(self, testing_time_points = []):
         if len(testing_time_points) == 0:
@@ -53,11 +52,7 @@ class PSM():
             self.testing_time_points = np.arange(0, self.training_time_points[-1]+1)
             self.save_test_points = testing_time_points
         
-        print('testing_time_points')
-        print(self.testing_time_points)
-        print('save_time_point')
-        print(self.save_test_points)
-    
+
     def get_img_objects(self, img_path):
         
         img_obj = nib.load(img_path)
@@ -108,8 +103,6 @@ class PSM():
         
         # creates a storage array
         bspline_coeffs = np.zeros(shape = (len(param), numcp+1))
-        print('bspline_coeffs')
-        print(np.shape(bspline_coeffs))
         
         # raises error if the number of control points are less than four
         # you need four in order to fit cubic BSpline
@@ -276,15 +269,16 @@ class PSM():
 
                 if testing_time_point == None:
                     
-                    for testing_time_point in self.testing_time_points:
+                    for testing_time_point_index in self.testing_time_points:
 
-                        model_cpp = self.results_path + '/PSM_CPS_' + str(self.no_cps) + '/' + str(self.Patient_No) + '/cpp_' + str(testing_time_point) + '.nii.gz'
-                        transformed_img = self.results_path + '/PSM_CPS_' + str(self.no_cps) + '/' + str(self.Patient_No) + '/BIN_' + str(structure) + '_T_' + str(testing_time_point) +'.nii.gz'
+                        model_cpp = self.results_path + '/PSM_CPS_' + str(self.no_cps) + '/' + str(self.Patient_No) + '/cpp_' + str(testing_time_point_index) + '.nii.gz'
+                        transformed_img = self.results_path + '/PSM_CPS_' + str(self.no_cps) + '/' + str(self.Patient_No) + '/BIN_' + str(structure) + '_T_' + str(testing_time_point_index) +'.nii.gz'
                         self.resampleBINImg(ref_img, float_img, model_cpp, transformed_img)
 
                 else:
                     model_cpp = self.results_path + '/PSM_CPS_' + str(self.no_cps) + '/' + str(self.Patient_No) + '/cpp_' + str(testing_time_point) + '.nii.gz'
                     transformed_img = self.results_path + '/PSM_CPS_' + str(self.no_cps) + '/' + str(self.Patient_No) + '/BIN_' + str(structure) + '_T_' + str(testing_time_point) +'.nii.gz'
+
                     self.resampleBINImg(ref_img, float_img, model_cpp, transformed_img)
 
 
@@ -296,16 +290,17 @@ class PSM():
             float_img = self.base_path + '/Masks/' + str(self.Patient_No) + '/atlas/BIN_' + str(structure) + '.nii.gz'
             
             if os.path.exists(float_img):
+                transformed_img = self.base_path + '/CPPs/' + str(self.Patient_No) + '/CBCT_' + str(training_time_point) + '/BIN_' + str(structure) + '.nii.gz'
+                #if not os.path.exists(transformed_img):
+                if training_time_point != None:
+                    model_cpp = self.base_path + '/CPPs/' + str(self.Patient_No) + '/CBCT_' + str(training_time_point) + '/cpp_CBCT.nii.gz'
+                    self.resampleBINImg(ref_img, float_img, model_cpp, transformed_img)
 
                 if training_time_point == None:
-                 
-                    for training_time_point in self.training_time_points:
-
-                        model_cpp = self.base_path + '/CPPs/' + str(self.Patient_No) + '/CBCT_' + str(training_time_point) + '/cpp_CBCT.nii.gz'
-                        transformed_img = self.base_path + '/CPPs/' + str(self.Patient_No) + '/CBCT_' + str(training_time_point) + '/BIN_' + str(structure) + '.nii.gz'
+                    for T_time_point in self.training_time_points:
+                        transformed_img = self.base_path + '/CPPs/' + str(self.Patient_No) + '/CBCT_' + str(T_time_point) + '/BIN_' + str(structure) + '.nii.gz'
+                        #if not os.path.exists(transformed_img):
+                        model_cpp = self.base_path + '/CPPs/' + str(self.Patient_No) + '/CBCT_' + str(T_time_point) + '/cpp_CBCT.nii.gz'
                         self.resampleBINImg(ref_img, float_img, model_cpp, transformed_img)
                 
-                else:
-                    model_cpp = self.base_path + '/CPPs/' + str(self.Patient_No) + '/CBCT_' + str(training_time_point) + '/cpp_CBCT.nii.gz'
-                    transformed_img = self.base_path + '/CPPs/' + str(self.Patient_No) + '/CBCT_' + str(training_time_point) + '/BIN_' + str(structure) + '.nii.gz'
-                    self.resampleBINImg(ref_img, float_img, model_cpp, transformed_img)
+               

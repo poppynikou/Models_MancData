@@ -12,6 +12,7 @@ def get_timepoints(anonymisation_key_path, Patient):
     CBCT_relative_timepoints = anonymisation_key.loc[anonymisation_key['No_Patient_ID'] == Patient_No].iloc[:,4:35].values.tolist()
     CBCT_relative_timepoints = CBCT_relative_timepoints[0]
     CBCT_relative_timepoints = [int(x) for x in CBCT_relative_timepoints if ~np.isnan(x)]
+    CBCT_relative_timepoints = list(np.sort(np.unique(CBCT_relative_timepoints)))
     return CBCT_relative_timepoints
 
 def get_image_objects(Img_path):

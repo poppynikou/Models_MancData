@@ -1,6 +1,6 @@
 # Scheduler directives
 #$ -S /bin/bash
-#$ -l h_rt=06:00:00
+#$ -l h_rt=10:00:00
 #$ -l tmem=4G
 #$ -l h_vmem=4G
 #$ -j y

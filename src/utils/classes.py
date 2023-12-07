@@ -65,7 +65,7 @@ class PatientData(MancData):
         CBCT_relative_timepoints = self.anonymisation_key.loc[self.anonymisation_key['Patient_ID'] == int(self.PatientID[0:9])].iloc[:,4:35].values.tolist()
         self.CBCT_relative_timepoints = CBCT_relative_timepoints[0]
         self.CBCT_relative_timepoints = [int(x) for x in self.CBCT_relative_timepoints if ~np.isnan(x)]
-        self.CBCT_relative_timepoints = np.array(list(set(self.CBCT_relative_timepoints)), dtype = np.int8)
+        self.CBCT_relative_timepoints = list(np.sort(np.unique(CBCT_relative_timepoints)))
         return self.CBCT_relative_timepoints
 
     def get_patient_folder(self):
